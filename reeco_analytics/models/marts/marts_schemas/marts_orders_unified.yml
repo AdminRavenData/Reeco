@@ -1,0 +1,33 @@
+version: 2
+
+models:
+  - name: marts_orders_unified
+    description: "Combines orders with buyer and supplier details for enriched reporting."
+    columns:
+      - name: order_id
+        description: "Unique identifier for each order."
+        tests:
+          - unique
+          - not_null
+      - name: buyerid
+        description: "Foreign key linking to buyer details."
+
+      - name: supplier_id
+        description: "Foreign key linking to supplier details."
+      - name: buyer_name
+        description: "Name of the buyer associated with the order."
+      - name: buyer_city
+        description: "City where the buyer is located."
+      - name: buyer_country
+        description: "Country where the buyer is located."
+      - name: chainid
+        description: "Identifier for the buyer's chain, if applicable."
+      - name: supplier_name
+        description: "Name of the supplier associated with the order."
+      - name: supplier_city
+        description: "City where the supplier is located."
+      - name: supplier_country
+        description: "Country where the supplier is located."
+      - name: total_price
+        description: "Total price of the order."
+

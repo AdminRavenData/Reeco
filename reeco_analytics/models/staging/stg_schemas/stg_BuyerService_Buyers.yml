@@ -1,0 +1,19 @@
+version: 2
+
+models:
+  - name: stg_BuyerService_Buyers
+    description: >
+      A staging view for buyers, extracting relevant fields and parsing JSON data for City and Country. Filters out demo accounts.
+    columns:
+      - name: Buyer_name
+        description: Name of the buyer.
+      - name: Buyer_id
+        description: Unique identifier for the buyer.
+      - name: City
+        description: City of the buyer, extracted from the ADDRESS JSON field.
+      - name: Country
+        description: Country of the buyer, extracted from the ADDRESS JSON field.
+      - name: Chainid
+        description: Identifier for the chain the buyer belongs to.
+      - name: created
+        description: Timestamp when the buyer record was created.

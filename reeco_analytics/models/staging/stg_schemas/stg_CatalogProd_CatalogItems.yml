@@ -1,0 +1,37 @@
+version: 2
+models:
+  - name: stg_CatalogProd_CatalogItems
+    description: "A staging view for processing catalog items data, including metadata such as creation, update, and deletion timestamps, and product attributes."
+    columns:
+      - name: item_id
+        description: "Unique identifier for the catalog item."
+      - name: name
+        description: "Name of the catalog item."
+      - name: created_datetime
+        description: "Timestamp of when the catalog item was created."
+      - name: updated_datetime
+        description: "Timestamp of when the catalog item was last updated."
+      - name: deleted_datetime
+        description: "Timestamp of when the catalog item was deleted."
+      - name: is_deleted
+        description: "Flag indicating whether the catalog item is marked as deleted."
+      - name: category
+        description: "Category of the catalog item."
+      - name: subcategory
+        description: "Subcategory of the catalog item."
+      - name: is_organic
+        description: "Flag indicating whether the catalog item is organic."
+      - name: brand
+        description: "Brand of the catalog item."
+      - name: is_vegetarian
+        description: "Flag indicating whether the catalog item is vegetarian."
+      - name: is_kosher
+        description: "Flag indicating whether the catalog item is kosher."
+      - name: storage_instructions
+        description: "Storage instructions for the catalog item."
+    meta:
+      owner: "Catalog Product Team"
+      tags:
+        - staging
+        - catalog
+        - products

@@ -1,0 +1,14 @@
+version: 2
+
+models:
+  - name: base_buyers
+    description: Combines buyer data with the most recent uploaded invoice date from documents for each buyer.
+    columns:
+      - name: buyer_id
+        description: Unique identifier for the buyer.
+      - name: buyer_name
+        description: Name of the buyer (assuming this exists in `stg_buyerservice_buyers`).
+      - name: other_buyer_fields
+        description: Placeholder for other fields from the `stg_buyerservice_buyers` table.
+      - name: last_uploaded_invoice
+        description: The most recent invoice date for the buyer from the documents data.

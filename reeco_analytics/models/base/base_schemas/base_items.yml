@@ -1,0 +1,49 @@
+version: 2
+models:
+  - name: base_items
+    description: "An enriched staging model that combines catalog items with their associated GL codes and checkout item changes."
+    columns:
+      - name: ITEM_ID
+        description: "Unique identifier for the catalog item."
+      - name: NAME
+        description: "Name of the catalog item."
+      - name: CREATED_DATETIME
+        description: "Timestamp of when the catalog item was created."
+      - name: UPDATED_DATETIME
+        description: "Timestamp of when the catalog item was last updated."
+      - name: DELETED_DATETIME
+        description: "Timestamp of when the catalog item was deleted."
+      - name: IS_DELETED
+        description: "Flag indicating whether the catalog item is marked as deleted."
+      - name: CATEGORY
+        description: "Category of the catalog item."
+      - name: SUBCATEGORY
+        description: "Subcategory of the catalog item."
+      - name: IS_ORGANIC
+        description: "Flag indicating whether the catalog item is organic."
+      - name: BRAND
+        description: "Brand of the catalog item."
+      - name: IS_VEGETARIAN
+        description: "Flag indicating whether the catalog item is vegetarian."
+      - name: IS_KOSHER
+        description: "Flag indicating whether the catalog item is kosher."
+      - name: STORAGE_INSTRUCTIONS
+        description: "Storage instructions for the catalog item."
+      - name: GLCODEID
+        description: "General Ledger Code ID associated with the catalog item from the buyer catalog mapping."
+      - name: OFFERID
+        description: "Offer ID from the checkout catalog item changes."
+      - name: SUPPLIERID
+        description: "Supplier ID from the checkout catalog item changes."
+      - name: OFFER_COUNT
+        description: "Count of occurrences of the offer change."
+      - name: RANK
+        description: "Rank of the offer change based on occurrence count and ID."
+    meta:
+      owner: "Data Integration Team"
+      tags:
+        - staging
+        - catalog
+        - enrichment
+        - gl_codes
+        - offers

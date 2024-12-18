@@ -1,0 +1,20 @@
+version: 2
+
+models:
+  - name: orders_with_prices
+    description: Combines order data with aggregated total prices from documents and orders.
+    columns:
+      - name: order_id
+        description: Unique identifier for the order.
+        tests:
+          - not_null
+      - name: status
+        description: The current status of the order.
+      - name: customer_id
+        description: Identifier linking the order to a customer.
+      - name: order_price_ordered
+        description: Total price of items ordered, aggregated from `stg_OrderService_Orders`.
+      - name: order_price_recieved
+        description: Total price of items received, aggregated from `stg_OrderService_Orders`.
+      - name: order_price_document
+        description: Maximum document-reported price for the order from `stg_DocumentService_Documents`.

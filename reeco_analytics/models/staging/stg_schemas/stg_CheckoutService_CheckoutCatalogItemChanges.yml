@@ -1,0 +1,31 @@
+version: 2
+models:
+  - name: stg_CheckoutService_CheckoutCatalogItemChanges
+    description: "A staging model for ranking offer changes for each catalog item based on their occurrence count. Extracts top offers and associated suppliers."
+    columns:
+      - name: CATALOGITEMID
+        description: "Unique identifier for the catalog item."
+      - name: offer_change_1
+        description: "OfferId of the top-ranked offer change for the catalog item."
+      - name: offer_change_1_supplier
+        description: "SupplierId associated with the top-ranked offer change."
+      - name: offer_change_2
+        description: "OfferId of the second-ranked offer change for the catalog item."
+      - name: offer_change_2_supplier
+        description: "SupplierId associated with the second-ranked offer change."
+      - name: offer_change_3
+        description: "OfferId of the third-ranked offer change for the catalog item."
+      - name: offer_change_3_supplier
+        description: "SupplierId associated with the third-ranked offer change."
+      - name: offer_change_1_count
+        description: "Count of occurrences for the top-ranked offer change."
+      - name: offer_change_2_count
+        description: "Count of occurrences for the second-ranked offer change."
+      - name: offer_change_3_count
+        description: "Count of occurrences for the third-ranked offer change."
+    meta:
+      owner: "Checkout Service Team"
+      tags:
+        - staging
+        - offers
+        - rankings
