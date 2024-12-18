@@ -2,13 +2,12 @@ select
 catalog.*,
 gl_code.GLCODEID,
 changes.*
-
-from REECO.SQL.STG_CATALOGPROD_CATALOGITEMS catalog
+from {{ref("stg_CatalogProd_CatalogItems")}} catalog
 left join 
-REECO.SQL.STG_CATALOGPROD_BUYERCATALOGITEMGLCODES  gl_code
+ {{ref("stg_CatalogProd_BuyerCatalogItemGLCodes")}} gl_code
 on
 catalog.ITEM_ID = gl_code.catalogitemid
 left join
-REECO.SQL.STG_CHECKOUTSERVICE_CHECKOUTCATALOGITEMCHANGES changes
+ {{ref("stg_CheckoutService_CheckoutCatalogItemChanges")}}  changes
 on 
 catalog.ITEM_ID = changes.catalogitemid
