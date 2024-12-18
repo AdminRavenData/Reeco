@@ -1,0 +1,15 @@
+version: 2
+models:
+  - name: stg_CatalogProd_BuyerCatalogItemGLCodes
+    description: "A staging model for mapping catalog items to their corresponding GL codes. Extracts distinct catalog item and GL code pairs."
+    columns:
+      - name: CATALOGITEMID
+        description: "Unique identifier for the catalog item."
+      - name: GLCODEID
+        description: "General Ledger Code ID associated with the catalog item."
+    meta:
+      owner: "Catalog Product Team"
+      tags:
+        - staging
+        - catalog
+        - gl_codes

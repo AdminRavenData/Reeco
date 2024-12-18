@@ -1,0 +1,11 @@
+SELECT
+distinct
+    NAME AS Buyer_name,
+    _ID AS Buyer_id,
+    TRY_PARSE_JSON(ADDRESS):City::STRING AS City,
+    TRY_PARSE_JSON(ADDRESS):Country::STRING AS Country,
+    CHAINID AS Chainid,
+    CREATEDATETIME AS created
+    
+FROM REECO.MONGO.BUYERSERVICE_BUYERS
+where ISDEMOACCOUNT = FALSE
