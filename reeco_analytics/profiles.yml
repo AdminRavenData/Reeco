@@ -1,49 +1,49 @@
-reeco:
-
-  target: dev
-  outputs:
-    dev:
-      account: zswtwee-productio2
-      database: REECO 
-      password: "Om3R@5355132"
-      role: ACCOUNTADMIN
-      schema: analytics_dev
-      threads: 1
-      type: snowflake
-      user: omerf
-      warehouse: REECO
-
-    prod:
-      account: zswtwee-productio2
-      database: REECO 
-      password: "Om3R@5355132"
-      role: ACCOUNTADMIN
-      schema: analytics_prod
-      threads: 1
-      type: snowflake
-      user: omerf
-      warehouse: REECO
-
 # reeco:
+
+#   target: dev
 #   outputs:
 #     dev:
 #       account: zswtwee-productio2
 #       database: REECO 
-#       password: 'reeco@5355132'
-#       role: DEV_AUEORITIES_ROLE
+#       password: "Om3R@5355132"
+#       role: ACCOUNTADMIN
 #       schema: analytics_dev
 #       threads: 1
 #       type: snowflake
-#       user: dev_user
+#       user: omerf
 #       warehouse: REECO
+
 #     prod:
 #       account: zswtwee-productio2
 #       database: REECO 
-#       password: 'reeco@5355132'
-#       role: DEV_AUEORITIES_ROLE
+#       password: "Om3R@5355132"
+#       role: ACCOUNTADMIN
 #       schema: analytics_prod
 #       threads: 1
 #       type: snowflake
-#       user: dev_user
+#       user: omerf
 #       warehouse: REECO
-#   target: dev
+
+reeco:
+  outputs:
+    dev:
+      account: zswtwee-productio2
+      database: REECO 
+      password: 'reeco@5355132'
+      role: DEV_AUEORITIES_ROLE
+      schema: analytics_dev
+      threads: 1
+      type: snowflake
+      user: dev_user
+      warehouse: REECO
+    prod:
+      account: zswtwee-productio2
+      database: REECO 
+      password: 'reeco@5355132'
+      role: DEV_AUEORITIES_ROLE
+      schema: analytics_prod
+      threads: 1
+      type: snowflake
+      user: dev_user
+      warehouse: REECO
+  target: dev
