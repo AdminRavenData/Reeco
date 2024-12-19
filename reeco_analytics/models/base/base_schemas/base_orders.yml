@@ -1,7 +1,7 @@
 version: 2
 
 models:
-  - name: orders_with_prices
+  - name: base_orders
     config:
       materialized: table
     description: Combines order data with aggregated total prices from documents and orders.
