@@ -1,6 +1,8 @@
 version: 2
 models:
   - name: base_items
+    config:
+      materialized: table
     description: "An enriched staging model that combines catalog items with their associated GL codes and checkout item changes."
     columns:
       - name: ITEM_ID
