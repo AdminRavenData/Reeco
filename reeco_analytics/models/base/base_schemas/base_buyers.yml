@@ -2,6 +2,9 @@ version: 2
 
 models:
   - name: base_buyers
+    config:
+      materialized: table
+
     description: Combines buyer data with the most recent uploaded invoice date from documents for each buyer.
     columns:
       - name: buyer_id
