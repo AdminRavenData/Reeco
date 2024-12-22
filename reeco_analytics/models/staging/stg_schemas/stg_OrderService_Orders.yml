@@ -5,8 +5,16 @@ models:
     columns:
       - name: order_id
         description: "Unique identifier for the order."
+        data_tests:
+          - not_null:
+              config:
+                warn_if: ">1"
       - name: item_name
         description: "Name of the catalog item."
+        data_tests:
+          - not_null:
+              config:
+                warn_if: ">1"
       - name: item_id
         description: "Unique identifier for the catalog item thumbnail."
       - name: category
@@ -33,9 +41,4 @@ models:
         description: "Unique identifier for the buyer."
       - name: supplier_id
         description: "Supplier ID associated with the order, extracted from BuyerSupplierInfo."
-    meta:
-      owner: "Order Service Team"
-      tags:
-        - staging
-        - orders
-        - catalog
+

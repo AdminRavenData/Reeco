@@ -7,8 +7,16 @@ models:
     columns:
       - name: Buyer_name
         description: Name of the buyer.
+        data_tests:
+          - not_null
       - name: Buyer_id
         description: Unique identifier for the buyer.
+        data_tests:
+          - not_null:
+              config:
+                # severity: error
+                # error_if: ">10"
+                warn_if: ">1"
       - name: City
         description: City of the buyer, extracted from the ADDRESS JSON field.
       - name: Country

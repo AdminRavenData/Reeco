@@ -7,8 +7,16 @@ models:
     columns:
       - name: ITEM_ID
         description: "Unique identifier for the catalog item."
+        data_tests:
+          - not_null:
+              config:
+                warn_if: ">1"
       - name: NAME
         description: "Name of the catalog item."
+        data_tests:
+          - not_null:
+              config:
+                warn_if: ">1"
       - name: CREATED_DATETIME
         description: "Timestamp of when the catalog item was created."
       - name: UPDATED_DATETIME
