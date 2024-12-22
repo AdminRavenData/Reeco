@@ -7,16 +7,6 @@ with ordered_items_temp as(
 
     ),
 
-order_recieved_temp as(
-SELECT 
-    *,
-    ROW_NUMBER() OVER (PARTITION BY _id ORDER BY UPDATEDATETIME DESC) AS rn
-
-
-FROM 
-    REECO.MONGO.ORDERSERVICE_ORDERS,
-
-),
 
 ordered_items as ( 
 SELECT 
@@ -43,7 +33,7 @@ SELECT
         ELSE NULL 
     END AS order_delete_date,
     ISDELETED AS ISDELETED,
-    ORDERDOCUMENTS:"_0":"DocumentId"::STRING AS document_id, 
+    -- ORDERDOCUMENTS:"_0":"DocumentId"::STRING AS document_id, 
     price_per_packing_ordered * packs_quantity_ordered as item_price_ordered,
     ROW_NUMBER() OVER (PARTITION BY _id ORDER BY UPDATEDATETIME DESC) AS rn
 
@@ -71,7 +61,7 @@ select
 
 
 FROM 
-    order_recieved_temp,
+    ordered_items_temp,
     LATERAL FLATTEN(INPUT => RECEIVEDORDER:CatalogItems) AS flattened_items
 
 where  rn = 1
@@ -100,11 +90,9 @@ select
     order_updated_date,
     order_delete_date,
     received_date,
-    order_status,
-    document_id
+    order_status
 
-
-from ordered_items inner join order_recieved 
+from ordered_items full outer join order_recieved 
 on
 ordered_items.order_id = order_recieved.order_id
 and

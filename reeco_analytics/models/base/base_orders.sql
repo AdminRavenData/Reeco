@@ -2,6 +2,7 @@ with documents_view as(
 select 
 ORDERID,
 document_Sku,
+max(DOCUMENT_ID) DOCUMENT_ID,
 max(document_item_name) as document_item_name,
 max(document_Order_Quantity) as document_Order_Quantity,
 max(document_Item_Price) as document_Item_Price,
@@ -23,13 +24,14 @@ group by ORDER_ID
 )
 
 select 
-o.* ,
+o.*,
 d.document_Order_Quantity,
 d.document_Item_Price,
 d.document_item_name,
 ov.order_price_ordered, 
 ov.order_price_recieved,
-d.order_price_document
+d.order_price_document,
+d.DOCUMENT_ID
 
 from 
  {{ref("stg_OrderService_Orders")}} o
