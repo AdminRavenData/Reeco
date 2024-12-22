@@ -11,32 +11,35 @@ from
  {{ref("stg_DocumentService_Documents")}}
 
 group by 1,2
-),
-
-orders_total_price_view as(
-select 
-ORDER_ID,  
-sum(ITEM_PRICE_ORDERED) as order_price_ordered, 
-sum(ITEM_PRICE_RECEIVED) as order_price_recieved  
-from
- {{ref("stg_OrderService_Orders")}}
-group by ORDER_ID 
 )
+
+-- ,
+
+-- orders_total_price_view as(
+-- select 
+-- ORDER_ID,  
+-- sum(ITEM_PRICE_ORDERED) as order_price_ordered, 
+-- sum(ITEM_PRICE_RECEIVED) as order_price_recieved  
+-- from
+--  {{ref("stg_OrderService_Orders")}}
+-- group by ORDER_ID 
+-- )
 
 select 
 o.*,
 d.document_Order_Quantity,
 d.document_Item_Price,
 d.document_item_name,
-ov.order_price_ordered, 
-ov.order_price_recieved,
 d.order_price_document,
 d.DOCUMENT_ID
+-- ,
+-- ov.order_price_ordered, 
+-- ov.order_price_recieved
 
 from 
  {{ref("stg_OrderService_Orders")}} o
 left join documents_view d
 on o.ORDER_ID = d.ORDERID and  o.ORDER_CATALOG_ITEM_SKU = d.document_Sku
-left join orders_total_price_view ov
-on 
-o.ORDER_ID = ov.ORDER_ID
+-- left join orders_total_price_view ov
+-- on 
+-- o.ORDER_ID = ov.ORDER_ID
