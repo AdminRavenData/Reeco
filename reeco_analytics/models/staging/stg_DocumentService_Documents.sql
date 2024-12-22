@@ -1,10 +1,11 @@
+
 with  DOCUMENT_ID_TEMP as(
     select *,
     ROW_NUMBER() OVER (PARTITION BY _id ORDER BY UPDATEDATETIME DESC) AS rn
     from 
     REECO.MONGO.DOCUMENTSERVICE_DOCUMENTS
 
-    )
+)
     
 select 
 _ID DOCUMENT_ID,
@@ -22,7 +23,16 @@ JSON_EXTRACT_PATH_TEXT(TOTALPRODUCTSPRICE, 'Value') AS TOTALPRODUCTSPRICE,
 ISDELETED AS ISDELETED,
 ISDEMO,
 STATUS,
-BUYERID
+BUYERID,
+flattened_items.VALUE:OcrDocumentLineItemSources:_0:OcrDocumentLineItemId::STRING AS OcrDocumentLineItemSources,
+flattened_items.VALUE:Name:Value::STRING AS document_item_name,
+flattened_items.VALUE:Sku:Value::STRING AS document_Sku,
+flattened_items.VALUE:OrderQuantity:Value::STRING document_Order_Quantity,
+flattened_items.VALUE:TotalPrice:Value::STRING document_Item_Price
 
-from DOCUMENT_ID_TEMP
+from DOCUMENT_ID_TEMP,
+
+LATERAL FLATTEN(INPUT => LINEITEMS) AS flattened_items
+
 where  rn = 1
+  
