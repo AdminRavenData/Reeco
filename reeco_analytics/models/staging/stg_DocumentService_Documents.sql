@@ -17,17 +17,18 @@ CASE
     ELSE NULL 
 END AS INVOICEDATE,
 UPDATEDATETIME,
-JSON_EXTRACT_PATH_TEXT(SUPPLIERNAME, 'Value') AS SUPPLIERNAME,
+JSON_EXTRACT_PATH_TEXT(SUPPLIERNAME, 'Value') AS SUPPLIER_NAME,
+JSON_EXTRACT_PATH_TEXT(REECOSUPPLIER, 'SupplierId') AS SUPPLIER_id,
 BUYERNAME,
 JSON_EXTRACT_PATH_TEXT(TOTALPRODUCTSPRICE, 'Value') AS TOTALPRODUCTSPRICE,
 ISDELETED AS ISDELETED,
 ISDEMO,
 STATUS,
-BUYERID,
-flattened_items.VALUE:OcrDocumentLineItemSources:_0:OcrDocumentLineItemId::STRING AS OcrDocumentLineItemSources,
+BUYERID as BUYER_ID,
+flattened_items.VALUE:CatalogItemId::STRING AS CatalogItemId,
 flattened_items.VALUE:Name:Value::STRING AS document_item_name,
 flattened_items.VALUE:Sku:Value::STRING AS document_Sku,
-flattened_items.VALUE:OrderQuantity:Value::STRING document_Order_Quantity,
+flattened_items.VALUE:OrderQuantity:Value::STRING document_Item_Quantity,
 flattened_items.VALUE:TotalPrice:Value::STRING document_Item_Price
 
 from DOCUMENT_ID_TEMP,

@@ -1,3 +1,12 @@
+WITH sup_TEMP AS (
+    SELECT
+        *,
+        ROW_NUMBER() OVER (PARTITION BY _id ORDER BY UPDATEDATETIME DESC) AS rn
+    FROM 
+        REECO.MONGO.SUPPLIERSERVICE_SUPPLIERS
+)
+
+
 SELECT
     _ID AS supplier_id,
     NAME AS supplier_name,
@@ -13,5 +22,7 @@ SELECT
     ADDRESS:City AS supplier_city,
     ADDRESS:Country AS supplier_country
 
-FROM 
-    REECO.MONGO.SUPPLIERSERVICE_SUPPLIERS
+FROM sup_TEMP
+
+where rn = 1
+    

@@ -7,6 +7,15 @@ with ordered_items_temp as(
 
     ),
 
+document_ids_cte AS (
+    SELECT 
+        _id AS order_id,
+        LISTAGG(flattend_documents_id.value:DocumentId::STRING, ',') AS document_ids_list
+    FROM ordered_items_temp,
+         LATERAL FLATTEN(INPUT => ORDERDOCUMENTS) AS flattend_documents_id
+    where  rn = 1
+    GROUP BY _id
+),
 
 ordered_items as ( 
 SELECT 
@@ -23,17 +32,18 @@ SELECT
     CAST(flattened_items.VALUE:PricePerPacking::STRING AS NUMERIC(38,2)) AS price_per_packing_ordered, 
     CAST(flattened_items.VALUE:Quantity::STRING AS NUMERIC(38,0)) AS packs_quantity_ordered,
     BUYERID,
+    BUYERINFO:SenderDepartmentId as Department_Id, 
+    BUYERINFO:SenderOutletId as Outlet_Id,
     BUYERSUPPLIERINFO:SupplierId::STRING AS supplier_id,
     STATUS AS order_status,
     CREATEDATETIME AS order_created_date,
     UPDATEDATETIME AS order_updated_date,
+    ISDELETED AS ISDELETED,
     CASE 
         WHEN REGEXP_LIKE(flattened_items.VALUE:DeleteDateTime::STRING, '^[0-9]+$')
         THEN TO_TIMESTAMP_NTZ(CAST(flattened_items.VALUE:DeleteDateTime::STRING AS NUMBER) / 1000)
         ELSE NULL 
-    END AS order_delete_date,
-    ISDELETED AS ISDELETED,
-    -- ORDERDOCUMENTS:"_0":"DocumentId"::STRING AS document_id, 
+    END AS order_delete_date,  
     price_per_packing_ordered * packs_quantity_ordered as item_price_ordered,
     ROW_NUMBER() OVER (PARTITION BY _id ORDER BY UPDATEDATETIME DESC) AS rn
 
@@ -71,6 +81,8 @@ where  rn = 1
 select
     COALESCE(ordered_items.order_id, order_recieved.order_id) as order_id,
     BUYERID,
+    Department_Id,
+    Outlet_Id,
     supplier_id,
     ordered_items.item_id as item_id,
     COALESCE(ordered_items.ORDER_CATALOG_ITEM_ID, order_recieved.ORDER_CATALOG_ITEM_ID) as ORDER_CATALOG_ITEM_ID,
@@ -90,7 +102,8 @@ select
     order_updated_date,
     order_delete_date,
     received_date,
-    order_status
+    order_status,
+    document_ids_list
 
 from ordered_items full outer join order_recieved 
 on
@@ -98,4 +111,6 @@ ordered_items.order_id = order_recieved.order_id
 and
 ordered_items.ORDER_CATALOG_ITEM_ID = order_recieved.ORDER_CATALOG_ITEM_ID
 
-    
+left join document_ids_cte
+on
+ordered_items.order_id = document_ids_cte.order_id

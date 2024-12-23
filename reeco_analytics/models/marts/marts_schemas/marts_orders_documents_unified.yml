@@ -1,7 +1,7 @@
 version: 2
 
 models:
-  - name: marts_orders_unified
+  - name: marts_orders_documents_unified
     config:
       materialized: table
     description: "Combines orders with buyer and supplier details for enriched reporting."

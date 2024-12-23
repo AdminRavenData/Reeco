@@ -1,0 +1,70 @@
+version: 2
+
+models:
+  - name: base_orders_documents
+    config:
+      materialized: table
+    description: >
+      Combines order data with document details, including document prices and quantities, and merges them based on order IDs and document IDs. 
+      The final result aggregates information from both orders and documents, ensuring the most relevant document data is included for each order.
+    columns:
+      - name: order_id
+        description: Unique identifier for the order.
+        tests:
+          - not_null:
+              config:
+                warn_if: ">1"
+      - name: item_id
+        description: Unique identifier for the item within the order.
+      - name: item_name
+        description: Name of the item within the order.
+      - name: sku
+        description: The SKU (Stock Keeping Unit) of the item in the order.
+      - name: category
+        description: The category of the item in the order.
+      - name: subcategory
+        description: The subcategory of the item in the order.
+      - name: is_removed_from_order
+        description: Indicator if the item has been removed from the order.
+      - name: is_reported_missing
+        description: Indicator if the item is reported as missing.
+      - name: glcode
+        description: General ledger code associated with the item.
+      - name: item_quantity_ordered
+        description: Quantity of the item ordered.
+      - name: item_quantity_received
+        description: Quantity of the item received.
+      - name: item_quantity_document
+        description: Quantity of the item from the document.
+      - name: item_price_ordered
+        description: Price per unit of the item ordered.
+      - name: item_price_received
+        description: Price per unit of the item received.
+      - name: item_price_document
+        description: Price per unit of the item from the document.
+      - name: order_created_date
+        description: The date when the order was created.
+      - name: order_updated_date
+        description: The date when the order was last updated.
+      - name: order_delete_date
+        description: The date when the order was deleted (if applicable).
+      - name: received_date
+        description: The date when the item was received.
+      - name: order_status
+        description: The current status of the order.
+      - name: order_catalog_item_id
+        description: The catalog item ID for the item in the order.
+      - name: buyer_id
+        description: The ID of the buyer who placed the order.
+      - name: department_id
+        description: The department ID associated with the item in the order.
+      - name: outlet_id
+        description: The outlet ID associated with the item in the order.
+      - name: supplier_id
+        description: The ID of the supplier providing the item.
+      - name: document_id
+        description: The ID of the document associated with the item.
+      - name: is_document
+        description: Indicator that the record is a document, derived from the `documents_view`.
+      - name: flattened_document_id
+        description: The flattened document ID extracted from the document list in the order.

@@ -3,7 +3,9 @@ version: 2
 models:
   - name: stg_BuyerService_Buyers
     description: >
-      A staging view for buyers, extracting relevant fields and parsing JSON data for City and Country. Filters out demo accounts.
+      A staging view for buyers, extracting relevant fields and parsing JSON data for City, Country, 
+      Department, and Outlet. Filters out demo accounts and retrieves the most recent buyer information.
+      
     columns:
       - name: Buyer_name
         description: Name of the buyer.
@@ -13,15 +15,22 @@ models:
         description: Unique identifier for the buyer.
         data_tests:
           - not_null:
-              config:
-                # severity: error
-                # error_if: ">10"
-                warn_if: ">1"
+              warn_if: ">1"
       - name: City
         description: City of the buyer, extracted from the ADDRESS JSON field.
       - name: Country
         description: Country of the buyer, extracted from the ADDRESS JSON field.
       - name: Chainid
         description: Identifier for the chain the buyer belongs to.
-      - name: created
+      - name: time_created
         description: Timestamp when the buyer record was created.
+      - name: time_updated
+        description: Timestamp when the buyer record was last updated.
+      - name: department_name
+        description: Name of the department associated with the buyer.
+      - name: department_id
+        description: Unique identifier for the department associated with the buyer.
+      - name: outlet_name
+        description: Name of the outlet associated with the department.
+      - name: outlet_id
+        description: Unique identifier for the outlet associated with the department.
