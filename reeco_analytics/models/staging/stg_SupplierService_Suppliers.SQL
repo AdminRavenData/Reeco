@@ -16,9 +16,9 @@ SELECT
     CATEGORIES AS categories_supplying,
     __DELETED AS is_deleted,
     ISDEMOACCOUNT AS is_demoaccount,
+    SUPPLIERGROUPID,
     
     -- Extract new variables from the ADDRESS JSONREECO
-    ADDRESS:State AS supplier_state,
     ADDRESS:City AS supplier_city,
     ADDRESS:Country AS supplier_country
 

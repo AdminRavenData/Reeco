@@ -45,7 +45,7 @@ select
     GLCODE,
     packs_quantity_ordered as ITEM_QUANTITY_ORDERED,
     ITEM_QUANTITY_RECEIVED,
-    document_Item_Quantity as ITEM_QUANTITY_documen,
+    document_Item_Quantity as ITEM_QUANTITY_document,
     ITEM_PRICE_ORDERED,
     ITEM_PRICE_RECEIVED,
     DOCUMENT_ITEM_PRICE as ITEM_PRICE_DOCUMENT,
