@@ -13,7 +13,7 @@ from
 
 where IS_REMOVED_FROM_ORDER = False
 and IS_REPORTED_MISSING = False
-
+and supplier_name is not null
 group by 1,2
 ),
 
@@ -24,6 +24,8 @@ SUPPLIER_CITY,
 SUPPLIER_COUNTRY
 FROM
  {{ref("stg_SupplierService_Suppliers")}}
+where
+ SUPPLIER_NAME is not null
 
 )
 

@@ -15,6 +15,7 @@ from
 
 where IS_REMOVED_FROM_ORDER = False
 and IS_REPORTED_MISSING = False
+and BUYER_NAME is not null
 
 group by 1,2,3,4
 ),
@@ -37,7 +38,7 @@ sum(COUNTVALUE) as items_invenory_counted,
 sum(TOTALVALUE) as TOTAL_VALUE_invenory
 from
     {{ref("stg_InventoryService_InventoryCounts")}}
-
+where BUYERNAME is not null
 group by 1,2,3
 )
 
