@@ -6,7 +6,7 @@ models:
       materialized: table
     description: "Combines order and document data with supplier details for analysis by supplier."
     columns:
-      - name: order_doc_date
+      - name: order_date
         description: "The date associated with either the order update or document update."
         data_tests:
           - not_null:
