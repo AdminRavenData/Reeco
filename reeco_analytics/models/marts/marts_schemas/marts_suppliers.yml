@@ -1,0 +1,36 @@
+version: 2
+
+models:
+  - name: marts_suppliers
+    config:
+      materialized: table
+    description: "Combines order and document data with supplier details for analysis by supplier."
+    columns:
+      - name: order_doc_date
+        description: "The date associated with either the order update or document update."
+        data_tests:
+          - not_null:
+              config:
+                warn_if: ">1"
+
+      - name: supplier_name
+        description: "Name of the supplier."
+        data_tests:
+          - not_null:
+              config:
+                warn_if: ">1"
+      - name: orders_count_distinct
+        description: "Count of distinct orders."
+
+      - name: total_value_ordered
+        description: "Total value of items ordered."
+
+      - name: total_value_recieved
+        description: "Total value of items received."
+
+      - name: SUPPLIER_CITY
+        description: "City where the supplier is located."
+
+      - name: SUPPLIER_COUNTRY
+        description: "Country where the supplier is located."
+

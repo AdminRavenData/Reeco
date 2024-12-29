@@ -1,6 +1,6 @@
 with order_document_view as(
 select
-coalesce(date(ORDER_UPDATED_DATE),date(DOCUMENT_UPDATED_DATE)) as order_doc_date,
+coalesce(date(ORDER_UPDATED_DATE),date(DOCUMENT_UPDATED_DATE)) as order_date,
 supplier_name,
 count(distinct order_id) as orders_count_distinct,
 -- count(distinct DOCUMENT_ID) as DOCUMENT_count_distinct,
