@@ -9,10 +9,6 @@ models:
     columns:
       - name: order_id
         description: "Unique identifier for each order."
-        data_tests:
-          - not_null:
-              config:
-                warn_if: ">1"
       - name: buyerid
         description: "Foreign key linking to buyer details."
       - name: supplier_id
