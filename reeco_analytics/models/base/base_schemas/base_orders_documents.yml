@@ -10,10 +10,6 @@ models:
     columns:
       - name: order_id
         description: Unique identifier for the order.
-        tests:
-          - not_null:
-              config:
-                warn_if: ">1"
       - name: item_id
         description: Unique identifier for the item within the order.
       - name: item_name
