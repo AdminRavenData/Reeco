@@ -11,7 +11,7 @@ SELECT
     _ID AS supplier_id,
     NAME AS supplier_name,
     CREATEDATETIME AS suppliers_joining_time,
-    SUPPLIERGROUPID AS supplier_group,
+    SUPPLIERGROUPID AS supplier_group_id,
     RATING AS rating,
     CATEGORIES AS categories_supplying,
     __DELETED AS is_deleted,

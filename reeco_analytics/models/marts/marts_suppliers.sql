@@ -1,7 +1,7 @@
 with order_document_view as(
 select
 coalesce(date(ORDER_UPDATED_DATE),date(DOCUMENT_UPDATED_DATE)) as order_date,
-supplier_name,
+SUPPLIER_ID,
 count(distinct order_id) as orders_count_distinct,
 -- count(distinct DOCUMENT_ID) as DOCUMENT_count_distinct,
 sum(ITEM_PRICE_ORDERED) as total_value_ordered,
@@ -13,26 +13,27 @@ from
 
 where IS_REMOVED_FROM_ORDER = False
 and IS_REPORTED_MISSING = False
-and supplier_name is not null
+and SUPPLIER_ID is not null
 group by 1,2
 ),
 
 stg_supplier_view as(
 SELECT
+SUPPLIER_ID,
+supplier_group_id,
 SUPPLIER_NAME,
 SUPPLIER_CITY,
 SUPPLIER_COUNTRY
 FROM
  {{ref("stg_SupplierService_Suppliers")}}
-where
- SUPPLIER_NAME is not null
+
 
 )
 
-select order_document_view.*,
-stg_supplier_view.* EXCLUDE(SUPPLIER_NAME)
+select order_document_view.* EXCLUDE(SUPPLIER_ID),
+stg_supplier_view.* 
 from order_document_view
 left join
 stg_supplier_view
 on 
-order_document_view.supplier_name = stg_supplier_view.SUPPLIER_NAME
+order_document_view.SUPPLIER_ID = stg_supplier_view.SUPPLIER_ID

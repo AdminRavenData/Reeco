@@ -2,23 +2,27 @@ version: 2
 
 models:
   - name: marts_buyers
+    description: "Combines order and document data with inventory data for analysis by buyer and outlet."
     config:
       materialized: table
-    description: "Combines order and document data with inventory data for analysis by buyer and outlet."
+
     columns:
       - name: order_doc_date
         description: "The date associated with either the order update or document update."
-        data_tests:
-          - not_null:
-              config:
-                warn_if: ">1"
+        tests:
+          - not_null
+
+      - name: BUYER_ID
+        description: "Unique identifier for the buyer."
+        tests:
+          - not_null
+
+      - name: OUTLET_ID 
+        description: "Unique identifier for the buyer."
+
 
       - name: BUYER_NAME
         description: "Name of the buyer."
-        data_tests:
-          - not_null:
-              config:
-                warn_if: ">1"
 
       - name: OUTLET_NAME
         description: "Name of the outlet."
@@ -26,10 +30,8 @@ models:
       - name: CHAINID
         description: "Identifier for the chain."
 
-
       - name: orders_count_distinct
         description: "Count of distinct orders."
-
 
       - name: DOCUMENT_count_distinct
         description: "Count of distinct documents."
@@ -43,11 +45,20 @@ models:
       - name: total_value_document
         description: "Total value of items documented."
 
+      - name: items_case_invenory_counted
+        description: "Sum of inventory items counted by case."
 
-      - name: items_invenory_counted
-        description: "Sum of inventory items counted."
+      - name: items_case_invenory_TOTAL_VALUE
+        description: "Total value of inventory items counted by case."
 
-      - name: TOTAL_VALUE_invenory
-        description: "Total value of inventory items."
+      - name: items_unit_invenory_counted
+        description: "Sum of inventory items counted by unit."
 
+      - name: items_unit_invenory_TOTAL_VALUE
+        description: "Total value of inventory items counted by unit."
 
+      - name: items_each_invenory_counted
+        description: "Sum of inventory items counted by each."
+
+      - name: items_each_invenory_TOTAL_VALUE
+        description: "Total value of inventory items counted by each."
