@@ -1,0 +1,14 @@
+version: 2
+
+models:
+  - name: base_supplier_group
+    description: "A model to calculate the number of connected suppliers for each buyer-supplier group."
+    config:
+      materialized: table
+    columns:
+      - name: BUYER_SUPPLIER_GROUP_ID
+        description: "Unique identifier for each buyer-supplier group."
+      - name: SUPPLIERS_GROUP_NAME
+        description: "Name of the supplier group."
+      - name: num_connected_suppliers
+        description: "The count of distinct suppliers connected to the buyer-supplier group."

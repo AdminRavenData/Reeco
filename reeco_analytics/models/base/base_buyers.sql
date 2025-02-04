@@ -10,7 +10,7 @@ group by BUYER_ID
 )
 
 select b.*, d.last_uploaded_invoice 
-from  {{ref("stg_BuyerService_Buyers")}} b
+from  {{ref("stg_buyer_department_outlet")}} b
 left join
 documents_view d
 on 

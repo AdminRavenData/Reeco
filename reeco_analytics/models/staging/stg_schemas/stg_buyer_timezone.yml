@@ -1,0 +1,12 @@
+
+
+version: 2
+
+models:
+  - name: stg_buyer_timezone
+    description: "Aggregates the latest timezone for each BUYER_ID."
+    columns:
+      - name: BUYER_ID
+        description: "Unique identifier for the buyer."
+      - name: timezone
+        description: "Latest timezone associated with the buyer."

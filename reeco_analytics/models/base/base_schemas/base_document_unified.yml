@@ -1,0 +1,64 @@
+version: 2
+models:
+  - name: base_document_unified
+    description: "This model unifies stg_documents_header and stg_documents_line while excluding specific columns."
+    config:
+      materialized: table
+    columns:
+      - name: DOCUMENT_ID
+        description: "Unique identifier for the document, present in the header."
+      - name: BUYER_ID
+        description: "Buyer identifier, present in the header."
+      - name: OUTLET_ID
+        description: "Outlet identifier, present in the header."
+      - name: reeco_Supplier_Id
+        description: "Reeco supplier ID, present in the header."
+      - name: TOTAL_PRODUCT_PRICE
+        description: "Total price of products from the document header."
+      - name: TOTAL_AMOUNT
+        description: "Total amount for the document, including taxes and other fees."
+      - name: TOTAL_DISCOUNT_PRICE
+        description: "Total discount applied to the document."
+      - name: TOTAL_TAX
+        description: "Total tax applied to the document."
+      - name: TOTAL_SHIPPING
+        description: "Total shipping costs for the document."
+      - name: INVOICE_DATE
+        description: "The invoice date of the document."
+      - name: CREATE_DATETIME
+        description: "The creation date and time of the document."
+      - name: DUEDATE
+        description: "The due date for the document."
+      - name: STATUS
+        description: "The status of the document."
+      - name: ORDERID
+        description: "Order ID associated with the document."
+      - name: SOURCE
+        description: "Source of the document."
+      - name: ISEXPORTED
+        description: "Flag indicating whether the document has been exported."
+      - name: export_date
+        description: "The date when the document was exported."
+      - name: Sku_document
+        description: "SKU for the document line item."
+      - name: item_name_document
+        description: "Item name for the document line item."
+      - name: Quantity_ordered_Item_document
+        description: "Quantity ordered for the line item in the document."
+      - name: Shipped_Quantity_item_document
+        description: "Shipped quantity for the line item in the document."
+      - name: Price_Per_unit_item_document
+        description: "Price per unit for the line item in the document."
+      - name: Total_Price_item_document
+        description: "Total price for the line item in the document."
+      - name: GlAccount
+        description: "GL account for the line item in the document."
+      - name: ExpenseName
+        description: "Expense name for the line item in the document."
+      - name: CatalogItemId
+        description: "Catalog item ID for the line item in the document."
+    sources:
+      - name: stg_documents_header
+        description: "Staging table for document headers."
+      - name: stg_documents_line
+        description: "Staging table for document lines."

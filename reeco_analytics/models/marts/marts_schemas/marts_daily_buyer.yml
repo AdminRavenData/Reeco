@@ -1,0 +1,50 @@
+
+
+version: 2
+
+models:
+  - name: marts_daily_buyer
+    description: >
+      This model combines data from buyers, orders, documents, and inventory views 
+      to create a unified dataset with key metrics and dimensions. It uses `buyers_view` 
+      as the base and performs left joins with the other views.
+    config:
+      materialized: table
+    columns:
+      - name: CHAIN_ID
+        description: "The unique identifier for the chain."
+      - name: BUYER_ID
+        description: "The unique identifier for the buyer."
+      - name: OUTLET_ID
+        description: "The unique identifier for the outlet. Null for aggregated data."
+      - name: CHAIN_NAME
+        description: "The name of the chain."
+      - name: BUYER_NAME
+        description: "The name of the buyer."
+      - name: OUTLET_NAME
+        description: "The name of the outlet. Null for aggregated data."
+      - name: REECO_SUPPLIER_ID
+        description: >
+          The supplier ID, derived from orders or documents views, using COALESCE.
+      - name: USER_ID
+        description: >
+          The user ID, derived from orders or inventory views, using COALESCE.
+      - name: CREATE_DATETIME
+        description: >
+          The creation date-time, derived from orders, documents, or inventory views, using COALESCE.
+      - name: QUANTITY_PACKING_ORDERED_ITEM
+        description: >
+          The total quantity of packing items ordered across orders.
+      - name: QUANTITY_PACKING_RECIEVED_ITEM
+        description: >
+          The total quantity of packing items received across orders.
+      - name: TOTAL_PRICE_ORDERED_ITEM
+        description: >
+          The total price of items ordered across orders.
+      - name: TOTAL_PRICE_RECIEVED_ITEM
+        description: >
+          The total price of items received across orders.
+      - name: INVENTORY_ITEM_TOTAL_VALUE
+        description: >
+          The total value of items in inventory from the inventory view.
+

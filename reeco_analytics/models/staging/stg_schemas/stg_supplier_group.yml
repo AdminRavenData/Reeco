@@ -1,0 +1,10 @@
+version: 2
+
+models:
+  - name: stg_supplier_group
+    description: Extracts the latest non-deleted, non-demo supplier group details based on the most recent update timestamp.
+    columns:
+      - name: suppliers_group_id
+        description: The unique identifier for the supplier group.
+      - name: suppliers_group_name
+        description: The name of the supplier group.

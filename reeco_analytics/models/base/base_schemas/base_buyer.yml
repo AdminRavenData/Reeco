@@ -1,0 +1,20 @@
+version: 2
+
+models:
+  - name: base_buyer
+    description: Aggregates buyer details with the maximum values for city, country, and timezone.
+    config:
+      materialized: table
+    columns:
+      - name: BUYER_ID
+        description: The unique identifier for the buyer.
+      - name: CHAIN_ID
+        description: The unique identifier for the chain associated with the buyer.
+      - name: BUYER_NAME
+        description: The name of the buyer.
+      - name: BUYER_CITY
+        description: The city of the buyer, derived as the maximum value across records.
+      - name: BUYER_COUNTRY
+        description: The country of the buyer, derived as the maximum value across records.
+      - name: TIMEZONE
+        description: The timezone of the buyer, derived as the maximum value across records.

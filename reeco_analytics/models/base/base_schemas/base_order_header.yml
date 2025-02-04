@@ -1,0 +1,65 @@
+version: 2
+
+models:
+  - name: base_order_header
+    description: "Aggregated order data from base_orders_unified, including total values and item counts."
+    config:
+      materialized: table
+    columns:
+      - name: order_id
+        description: "Unique identifier for the order."
+
+      - name: buyer_id
+        description: "Identifier for the buyer who placed the order."
+      
+      - name: supplier_id
+        description: "Identifier for the supplier fulfilling the order."
+      
+      - name: order_created_date
+        description: "Timestamp when the order was created."
+      
+      - name: order_delivery_datetime
+        description: "Scheduled delivery date and time of the order."
+      
+      - name: cut_off_datetime
+        description: "Cut-off date and time for order changes."
+      
+      - name: order_sent_to_supplier_datetime
+        description: "Timestamp when the order was sent to the supplier."
+      
+      - name: order_closed_datetime
+        description: "Timestamp when the order was closed."
+      
+      - name: status
+        description: "Current status of the order (e.g., Open, Closed)."
+      
+      - name: is_auto_closed
+        description: "Boolean flag indicating if the order was automatically closed."
+      
+      - name: user_id
+        description: "Identifier for the user who placed the order."
+      
+      - name: backoffice_assignee_user_id
+        description: "Identifier for the back-office user assigned to manage the order."
+      
+      - name: approvers_count
+        description: "Number of approvers required for the order."
+      
+      - name: closed_with_issues
+        description: "Boolean flag indicating if the order was closed with issues."
+      
+      - name: document_id
+        description: "Unique identifier for the related document."
+      
+      - name: order_total_value
+        description: "Total monetary value of ordered items in the order."
+
+      
+      - name: recieved_total_value
+        description: "Total monetary value of received items in the order."
+      
+      - name: count_items_ordered
+        description: "Number of distinct catalog items ordered."
+      
+      - name: count_items_recieved
+        description: "Number of distinct catalog items received."

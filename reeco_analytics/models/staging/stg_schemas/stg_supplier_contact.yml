@@ -1,0 +1,24 @@
+
+
+version: 2
+
+models:
+  - name: stg_supplier_contact
+    description: Extracts the latest non-deleted supplier contact details, excluding those associated with demo supplier IDs.
+    columns:
+      - name: user_id
+        description: The unique identifier for the contact user.
+      - name: BUYER_SUPPLIER_ID
+        description: The unique identifier for the buyer-supplier relationship.
+      - name: FIRSTNAME
+        description: The first name of the contact.
+      - name: LASTNAME
+        description: The last name of the contact.
+      - name: EMAIL
+        description: The email address of the contact.
+      - name: PHONENUMBER
+        description: The phone number of the contact.
+      - name: AUTOSENDEMAIL
+        description: Indicates whether automatic emails are enabled for the contact.
+      - name: AUTOSENDSMS
+        description: Indicates whether automatic SMS messages are enabled for the contact.

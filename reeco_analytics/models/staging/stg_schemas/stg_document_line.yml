@@ -1,0 +1,46 @@
+
+version: 2
+
+models:
+  - name: stg_document_line
+    description: "Staging model for document items, including detailed line items from orders."
+    columns:
+      - name: document_id
+        description: "Unique identifier for the document."
+
+      
+      - name: buyer_id
+        description: "Identifier for the buyer associated with the document."
+      
+      - name: outlet_id
+        description: "Identifier for the outlet linked to the document."
+      
+      - name: reeco_supplier_id
+        description: "Identifier for the supplier in the Reeco system."
+      
+      - name: sku_document
+        description: "SKU identifier extracted from document items."
+      
+      - name: item_name_document
+        description: "Name of the item extracted from document items."
+      
+      - name: quantity_ordered_item_document
+        description: "Quantity of the item ordered as per the document."
+      
+      - name: shipped_quantity_item_document
+        description: "Quantity of the item shipped as per the document."
+      
+      - name: price_per_unit_item_document
+        description: "Price per unit of the item as listed in the document."
+      
+      - name: total_price_item_document
+        description: "Total price for the item in the document."
+      
+      - name: glaccount
+        description: "General ledger account for the item."
+      
+      - name: expensename
+        description: "Expense classification for the item."
+      
+      - name: catalogitemid
+        description: "Unique identifier for the catalog item associated with the document."

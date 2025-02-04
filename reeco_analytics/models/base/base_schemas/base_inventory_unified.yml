@@ -1,0 +1,50 @@
+version: 2
+models:
+  - name: base_inventory_unified
+    description: "This model combines inventory header and line data by joining on INVENTORY_COUNT_ID."
+    config:
+      materialized: table
+    columns:
+      - name: INVENTORY_COUNT_ID
+        description: "Unique identifier for the inventory count, originating from stg_inventory_header."
+      - name: CREATE_DATETIME
+        description: "Timestamp when the inventory was created."
+      - name: UPDATED_ATETIME
+        description: "Timestamp when the inventory was last updated."
+      - name: BUYER_ID
+        description: "Identifier for the buyer associated with the inventory."
+      - name: OUTLET_ID
+        description: "Identifier for the outlet associated with the inventory."
+      - name: user_id
+        description: "Identifier for the user who created the inventory count."
+      - name: user_name
+        description: "Name of the user who created the inventory count."
+      - name: STARTED_DATETIME
+        description: "Timestamp when the inventory count was started."
+      - name: FINISH_DATETIME
+        description: "Timestamp when the inventory count was finished."
+      - name: STATUS
+        description: "Current status of the inventory count."
+      - name: locations_count
+        description: "Number of locations associated with the inventory count."
+      - name: INVENTORY_item_id
+        description: "Unique identifier for an item within the inventory count."
+      - name: Catalog_Item_Id
+        description: "Catalog item ID associated with the inventory item."
+      - name: CASE_TOTAL_VALUE
+        description: "Total value for case items in the inventory count."
+      - name: CASE_Count_Value
+        description: "Count value for case items in the inventory count."
+      - name: UNIT_TOTAL_VALUE
+        description: "Total value for unit items in the inventory count."
+      - name: UNIT_Count_Value
+        description: "Count value for unit items in the inventory count."
+      - name: EACH_TOTAL_VALUE
+        description: "Total value for individual items in the inventory count."
+      - name: EACH_Count_Value
+        description: "Count value for individual items in the inventory count."
+      - name: inventory_item_total_value
+        description: "Total inventory value calculated as the sum of case, unit, and individual item values."
+      - name: AvgPrice
+        description: "Average price for items in the inventory count."
+    

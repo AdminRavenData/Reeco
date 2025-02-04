@@ -1,0 +1,29 @@
+version: 2
+
+models:
+  - name: stg_buyer_outlet_user
+    description: >
+      This model processes data from the `REECO.MONGO.BUYERSERVICE_BUYERS` table to extract buyer details, 
+      including outlets, user information, and associated contact details.
+    columns:
+      - name: Buyer_name
+        description: Name of the buyer.
+      - name: outlet_name
+        description: Name of the outlet.
+      - name: FirstName
+        description: First name of the user.
+      - name: LastName
+        description: Last name of the user.
+      - name: JobTitle
+        description: Job title of the user.
+      - name: Email
+        description: Email contact information of the user.
+      - name: phone
+        description: Phone contact information of the user.
+      - name: user_id
+        description: Unique identifier for the user.
+      - name: Buyer_id
+        description: Unique identifier for the buyer.
+      - name: outlet_id
+        description: Unique identifier for the outlet.
+

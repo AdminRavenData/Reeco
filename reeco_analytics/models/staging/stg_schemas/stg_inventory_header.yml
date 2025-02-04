@@ -1,0 +1,36 @@
+
+version: 2
+models:
+  - name: stg_inventory_header
+    description: "A staging model that processes and flattens inventory data from the REECO inventory service."
+    columns:
+      - name: count_id
+        description: "Unique identifier for the inventory count."
+      - name: CREATE_DATETIME
+        description: "Datetime when the inventory count was created."
+      - name: UPDATED_ATETIME
+        description: "Datetime when the inventory count was last updated."
+      - name: BUYER_ID
+        description: "Identifier for the buyer associated with the inventory count."
+      - name: OUTLET_ID
+        description: "Identifier for the outlet associated with the inventory count."
+      - name: user_id
+        description: "Identifier for the user who created the inventory count."
+      - name: user_name
+        description: "Name of the user who created the inventory count."
+      - name: STARTED_DATETIME
+        description: "Datetime when the inventory count started."
+      - name: FINISH_DATETIME
+        description: "Datetime when the inventory count finished."
+      - name: STATUS
+        description: "Current status of the inventory count."
+      - name: locations_count
+        description: "Number of locations in the inventory count."
+      - name: CASE_TOTAL_VALUE
+        description: "Total value of cases in the inventory count."
+      - name: UNIT_TOTAL_VALUE
+        description: "Total value of units in the inventory count."
+      - name: EACH_TOTAL_VALUE
+        description: "Total value of individual items in the inventory count."
+      - name: total_value
+        description: "Total value of the inventory count, summing all item types."

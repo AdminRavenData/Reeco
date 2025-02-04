@@ -1,0 +1,9 @@
+version: 2
+
+models:
+  - name: stg_demo_ids
+    description: "Union of demo buyers and demo suppliers"
+    columns:
+      - name: demo_id
+        description: "ID of demo accounts, sourced from both buyers and suppliers"
+

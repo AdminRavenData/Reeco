@@ -1,0 +1,33 @@
+
+
+version: 2
+models:
+  - name: base_inventory_header
+    description: "Aggregated inventory data with total inventory item values."
+    config:
+      materialized: table
+    columns:
+      - name: INVENTORY_count_id
+        description: "Unique identifier for the inventory count."
+      - name: CREATE_DATETIME
+        description: "Timestamp of when the inventory record was created."
+      - name: UPDATED_ATETIME
+        description: "Timestamp of the last update to the inventory record."
+      - name: BUYER_ID
+        description: "Unique identifier for the buyer."
+      - name: OUTLET_ID
+        description: "Unique identifier for the outlet."
+      - name: user_id
+        description: "Unique identifier for the user who created the record."
+      - name: user_name
+        description: "Name of the user who created the record."
+      - name: STARTED_DATETIME
+        description: "Timestamp indicating when the inventory process started."
+      - name: FINISH_DATETIME
+        description: "Timestamp indicating when the inventory process finished."
+      - name: STATUS
+        description: "Current status of the inventory process."
+      - name: locations_count
+        description: "Count of locations involved in the inventory."
+      - name: INVENTORY_ITEM_TOTAL_VALUE
+        description: "Summed total value of all inventory items."

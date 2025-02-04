@@ -1,0 +1,33 @@
+
+version: 2
+
+models:
+  - name: base_inventory_line
+    description: |
+      This model selects inventory data from the `base_documents_unified` model 
+      and calculates aggregated fields for various total and count values.
+    config:
+      materialized: table
+    columns:
+      - name: INVENTORY_count_id
+        description: Unique identifier for the inventory count.
+      - name: INVENTORY_item_id
+        description: Unique identifier for the inventory item.
+      - name: Catalog_Item_Id
+        description: Unique identifier for catalog items.
+      - name: CASE_TOTAL_VALUE
+        description: Total value for cases in inventory.
+      - name: CASE_Count_Value
+        description: Count value for cases in inventory.
+      - name: UNIT_TOTAL_VALUE
+        description: Total value for units in inventory.
+      - name: UNIT_Count_Value
+        description: Count value for units in inventory.
+      - name: EACH_TOTAL_VALUE
+        description: Total value for individual items in inventory.
+      - name: EACH_Count_Value
+        description: Count value for individual items in inventory.
+      - name: inventory_item_total_value
+        description: Total value of all items in inventory.
+      - name: AvgPrice
+        description: Average price of items in inventory.

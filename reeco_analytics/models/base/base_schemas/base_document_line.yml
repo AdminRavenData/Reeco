@@ -1,0 +1,33 @@
+version: 2
+models:
+  - name: base_document_line
+    description: "This model selects specific fields from base_documents_unified."
+    config:
+      materialized: table
+    columns:
+      - name: DOCUMENT_ID
+        description: "Unique identifier for the document."
+      - name: BUYER_ID
+        description: "Identifier for the buyer associated with the document."
+      - name: OUTLET_ID
+        description: "Identifier for the outlet associated with the document."
+      - name: reeco_Supplier_Id
+        description: "Reeco supplier ID linked to the document."
+      - name: Sku_document
+        description: "SKU for the document line item."
+      - name: item_name_document
+        description: "Item name for the document line item."
+      - name: Quantity_ordered_Item_document
+        description: "Quantity ordered for the line item in the document."
+      - name: Shipped_Quantity_item_document
+        description: "Shipped quantity for the line item in the document."
+      - name: Price_Per_unit_item_document
+        description: "Price per unit for the line item in the document."
+      - name: Total_Price_item_document
+        description: "Total price for the line item in the document."
+      - name: GlAccount
+        description: "GL account for the line item in the document."
+      - name: ExpenseName
+        description: "Expense name for the line item in the document."
+      - name: CatalogItemId
+        description: "Catalog item ID for the line item in the document."

@@ -1,0 +1,42 @@
+version: 2
+
+models:
+  - name: stg_order_line
+    description: "A staging model for OrderService orders with flattened catalog items and calculated fields."
+    config:
+      materialized: view
+    columns:
+      - name: order_id
+        description: "Unique identifier for the order."
+      - name: order_created_date
+        description: "Date and time the order was created."
+      - name: order_DELIVERY_DATETIME
+        description: "Expected delivery date and time for the order."
+      - name: item_name
+        description: "Name of the catalog item."
+      - name: Catalog_item_id
+        description: "Unique identifier for the catalog item."
+      - name: created_date_item
+        description: "Date and time the catalog item was created."
+      - name: recieved_date_item
+        description: "Date and time the item was received."
+      - name: GLCode_item
+        description: "GL code associated with the catalog item."
+      - name: Expense_Name_item
+        description: "Expense name associated with the catalog item."
+      - name: brand_item
+        description: "Brand of the catalog item."
+      - name: sku_item
+        description: "SKU of the catalog item."
+      - name: quantity_ordered_item
+        description: "Quantity of the item ordered."
+      - name: quantity_recieved_item
+        description: "Quantity of the item received."
+      - name: price_per_packing_ordered_item
+        description: "Price per packing unit of the item ordered."
+      - name: price_per_packing_recieved_item
+        description: "Price per packing unit of the item received."
+      - name: total_price_ordered_item
+        description: "Total price for the item ordered."
+      - name: total_price_recieved_item
+        description: "Total price for the item received."

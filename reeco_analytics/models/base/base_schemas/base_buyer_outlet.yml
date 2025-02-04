@@ -1,0 +1,28 @@
+version: 2
+
+models:
+  - name: base_buyer_outlet
+    description: Aggregates distinct counts of buyer, department, and outlet details grouped by various fields.
+    config:
+      materialized: table
+    columns:
+      - name: CHAIN_ID
+        description: The unique identifier for the chain.
+      - name: BUYER_ID
+        description: The unique identifier for the buyer.
+      - name: DEPARTMENT_ID
+        description: The unique identifier for the department.
+      - name: OUTLET_ID
+        description: The unique identifier for the outlet.
+      - name: DEPARTMENT_NAME
+        description: The name of the department.
+      - name: OUTLET_NAME
+        description: The name of the outlet.
+      - name: CODE_OUTLET
+        description: The code representing the outlet.
+      - name: DESCRIPTION_OUTLET
+        description: A detailed description of the outlet.
+      - name: BUDGET_VALUE_OUTLET
+        description: The budget value assigned to the outlet.
+      - name: cd
+        description: The count of distinct combinations of chain, buyer, department, and outlet details.

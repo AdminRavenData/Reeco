@@ -1,0 +1,29 @@
+
+
+version: 2
+
+models:
+  - name: stg_role_mapping
+    description: "Mapping of buyer roles in the Reeco DWH."
+    columns:
+      - name: Id
+        description: "Unique identifier for the role."
+
+      - name: CreateDateTime
+        description: "Timestamp of when the role was created."
+      - name: UpdateDateTime
+        description: "Timestamp of the last update to the role."
+      - name: DeleteDateTime
+        description: "Timestamp of when the role was deleted, if applicable."
+      - name: IsDeleted
+        description: "Flag indicating if the role is deleted. 0 means active, 1 means deleted."
+      - name: Name
+        description: "Name of the role."
+      - name: Description
+        description: "Description of the role."
+      - name: UserType
+        description: "Type of user assigned to the role."
+      - name: RoleType
+        description: "Type of role assigned."
+      - name: Module
+        description: "Module associated with the role."

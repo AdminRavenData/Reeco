@@ -1,0 +1,34 @@
+version: 2
+
+models:
+  - name: stg_order_header
+    description: >
+      A staging view for orders from the OrderService, providing detailed information 
+      about orders, their status, associated users, and approvers.
+    columns:
+      - name: order_id
+        description: The unique identifier of the order.
+      - name: BUYER_ID
+        description: The ID of the buyer associated with the order.
+      - name: Supplier_Id
+        description: The ID of the supplier, extracted from the SupplierInfo JSON.
+      - name: order_created_date
+        description: The datetime when the order was created.
+      - name: order_DELIVERY_DATETIME
+        description: The datetime when the order is scheduled for delivery.
+      - name: CUT_OFF_DATETIME
+        description: The datetime by which the order must be processed.
+      - name: order_sent_to_supplier_datetime
+        description: The datetime when the order was sent to the supplier.
+      - name: closed_order_datetime
+        description: The datetime when the order was closed.
+      - name: status
+        description: The current status of the order.
+      - name: is_auto_closed
+        description: Indicates if the order was automatically closed (true/false).
+      - name: user_Id
+        description: The ID of the user associated with the order, extracted from BuyerInfo JSON.
+      - name: backoffice_assignee_user_Id
+        description: The ID of the backoffice user assigned to the order.
+      - name: approvers_count
+        description: The number of approvers associated with the order, counted from the APPROVERLISTS JSON field.

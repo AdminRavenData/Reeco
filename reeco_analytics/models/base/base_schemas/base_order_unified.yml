@@ -1,0 +1,95 @@
+
+version: 2
+
+models:
+  - name: base_order_unified
+    description: "Staging model for orders data, combining order headers and order lines."
+    config:
+      materialized: table
+    columns:
+      - name: order_id
+        description: "Unique identifier for the order."
+        tests:
+          - unique
+          - not_null
+      
+      - name: buyer_id
+        description: "Identifier for the buyer who placed the order."
+      
+      - name: supplier_id
+        description: "Identifier for the supplier fulfilling the order."
+      
+      - name: order_created_date
+        description: "Timestamp when the order was created."
+      
+      - name: order_delivery_datetime
+        description: "Scheduled delivery date and time of the order."
+      
+      - name: cut_off_datetime
+        description: "Cut-off date and time for order changes."
+      
+      - name: order_sent_to_supplier_datetime
+        description: "Timestamp when the order was sent to the supplier."
+      
+      - name: closed_order_datetime
+        description: "Timestamp when the order was closed."
+      
+      - name: status
+        description: "Current status of the order (e.g., Open, Closed)."
+      
+      - name: is_auto_closed
+        description: "Boolean flag indicating if the order was automatically closed."
+      
+      - name: user_id
+        description: "Identifier for the user who placed the order."
+      
+      - name: backoffice_assignee_user_id
+        description: "Identifier for the back-office user assigned to manage the order."
+      
+      - name: approvers_count
+        description: "Number of approvers required for the order."
+      
+      - name: closed_with_issues
+        description: "Boolean flag indicating if the order was closed with issues."
+      
+      - name: item_name
+        description: "Name of the ordered item."
+      
+      - name: catalog_item_id
+        description: "Unique identifier for the catalog item."
+      
+      - name: created_date_item
+        description: "Timestamp when the item was created."
+      
+      - name: received_date_item
+        description: "Timestamp when the item was received."
+      
+      - name: glcode_item
+        description: "General ledger code for the item."
+      
+      - name: expense_name_item
+        description: "Expense classification for the item."
+      
+      - name: brand_item
+        description: "Brand name of the item."
+      
+      - name: sku_item
+        description: "Stock-keeping unit (SKU) identifier for the item."
+      
+      - name: quantity_packing_ordered_item
+        description: "Quantity of the item ordered."
+      
+      - name: quantity_packing_received_item
+        description: "Quantity of the item received."
+      
+      - name: price_per_packing_ordered_item
+        description: "Price per unit of the item as ordered."
+      
+      - name: price_per_packing_received_item
+        description: "Price per unit of the item as received."
+      
+      - name: total_price_ordered_item
+        description: "Total price for the item as ordered."
+      
+      - name: total_price_received_item
+        description: "Total price for the item as received."

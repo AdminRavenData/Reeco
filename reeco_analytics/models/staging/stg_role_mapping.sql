@@ -1,0 +1,4 @@
+select
+* 
+from
+REECO.DWH.BUYER_ROLE_MAPPING

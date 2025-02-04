@@ -1,0 +1,19 @@
+
+version: 2
+
+models:
+  - name: base_supplier
+    description: "A model summarizing supplier connections, including max OPCO, number of buyers, and users connected to each supplier."
+    config:
+      materialized: table
+    columns:
+      - name: SUPPLIER_ID
+        description: "Unique identifier for each supplier."
+      - name: SUPPLIERS_GROUP_ID
+        description: "Unique identifier for the supplier group."
+      - name: OPCO
+        description: "Maximum OPCO value for the supplier."
+      - name: num_buyers_connected
+        description: "Count of distinct buyers connected to the supplier."
+      - name: num_users_connected
+        description: "Count of distinct users connected to the supplier."

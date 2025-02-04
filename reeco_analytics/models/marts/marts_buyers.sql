@@ -66,7 +66,7 @@ BUYER_NAME,
 BUYER_ID
 
 from 
-   {{ref("stg_BuyerService_Buyers")}}
+   {{ref("stg_buyer_department_outlet")}}
 ),
 
 outlet_view as(
@@ -75,7 +75,7 @@ OUTLET_NAME,
 OUTLET_ID
 
 from 
-    {{ref("stg_BuyerService_Buyers")}}
+    {{ref("stg_buyer_department_outlet")}}
 ),
 
 inventory_view as (

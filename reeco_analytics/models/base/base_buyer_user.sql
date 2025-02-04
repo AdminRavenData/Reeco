@@ -1,0 +1,25 @@
+select 
+CHAIN_ID,
+BUYER_ID,
+OUTLET_ID,
+USER_ID,
+FIRSTNAME,
+LASTNAME,
+EMAIL,
+PHONE,
+JOBTITLE
+
+from
+{{ref("stg_buyer_user")}}
+
+group by 
+
+CHAIN_ID,
+BUYER_ID,
+OUTLET_ID,
+USER_ID,
+FIRSTNAME,
+LASTNAME,
+EMAIL,
+PHONE,
+JOBTITLE

@@ -1,28 +1,28 @@
 with view_buyers as(
 select 
-BUYER_NAME, DEPARTMENT_NAME,OUTLET_NAME, CHAINID, BUYER_CITY, BUYER_COUNTRY,BUYER_ID, DEPARTMENT_ID,OUTLET_ID
+BUYER_NAME, DEPARTMENT_NAME,OUTLET_NAME, Chain_id, BUYER_CITY, BUYER_COUNTRY,BUYER_ID, DEPARTMENT_ID,OUTLET_ID
 from
 {{ref("base_buyers")}}
-group by BUYER_NAME, DEPARTMENT_NAME,OUTLET_NAME, CHAINID, BUYER_CITY, BUYER_COUNTRY,BUYER_ID, DEPARTMENT_ID,OUTLET_ID
+group by BUYER_NAME, DEPARTMENT_NAME,OUTLET_NAME, Chain_id, BUYER_CITY, BUYER_COUNTRY,BUYER_ID, DEPARTMENT_ID,OUTLET_ID
 ),
 
 view_buyers_not_outlet as(
 select 
-BUYER_NAME, DEPARTMENT_NAME, CHAINID, BUYER_CITY, BUYER_COUNTRY,BUYER_ID, DEPARTMENT_ID,
+BUYER_NAME, DEPARTMENT_NAME, Chain_id, BUYER_CITY, BUYER_COUNTRY,BUYER_ID, DEPARTMENT_ID,
 null as OUTLET_NAME
 from
 view_buyers
-group by BUYER_NAME, DEPARTMENT_NAME, CHAINID, BUYER_CITY, BUYER_COUNTRY,BUYER_ID, DEPARTMENT_ID
+group by BUYER_NAME, DEPARTMENT_NAME, Chain_id, BUYER_CITY, BUYER_COUNTRY,BUYER_ID, DEPARTMENT_ID
 ),
 
 view_buyers_not_outlet_not_dep as(
 select 
-BUYER_NAME, CHAINID, BUYER_CITY, BUYER_COUNTRY,BUYER_ID,
+BUYER_NAME, Chain_id, BUYER_CITY, BUYER_COUNTRY,BUYER_ID,
 null as DEPARTMENT_NAME,
 null as OUTLET_NAME
 from
 view_buyers
-group by BUYER_NAME, CHAINID, BUYER_CITY, BUYER_COUNTRY,BUYER_ID
+group by BUYER_NAME, Chain_id, BUYER_CITY, BUYER_COUNTRY,BUYER_ID
 ),
 
 view_suppliers as(
@@ -45,7 +45,7 @@ coalesce(view_buyers.BUYER_COUNTRY, view_buyers_not_outlet.BUYER_COUNTRY,view_bu
 coalesce(view_buyers.BUYER_CITY, view_buyers_not_outlet.BUYER_CITY,view_buyers_not_outlet_not_dep.BUYER_CITY) as BUYER_CITY,
 view_suppliers.* EXCLUDE(supplier_name),
 coalesce( base_orders_documents.SUPPLIER_NAME, view_suppliers.supplier_name) as supplier_name,
-coalesce(view_buyers.CHAINID, view_buyers_not_outlet.CHAINID,view_buyers_not_outlet_not_dep.CHAINID) as CHAINID
+coalesce(view_buyers.Chain_id, view_buyers_not_outlet.Chain_id,view_buyers_not_outlet_not_dep.Chain_id) as Chain_id
 
 
 from 

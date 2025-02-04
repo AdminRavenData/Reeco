@@ -1,0 +1,30 @@
+
+
+version: 2
+models:
+  - name: stg_inventory_line
+    description: "A staging model that processes and flattens inventory data, including item-level details and total value calculations."
+
+    columns:
+      - name: INVENTORY_count_id
+        description: "Unique identifier for the inventory count."
+      - name: INVENTORY_item_id
+        description: "Unique identifier for the inventory item."
+      - name: Catalog_Item_Id
+        description: "Catalog item ID associated with the inventory item."
+      - name: CASE_TOTAL_VALUE
+        description: "Total value of cases in the inventory count."
+      - name: CASE_Count_Value
+        description: "Count value of cases in the inventory count."
+      - name: UNIT_TOTAL_VALUE
+        description: "Total value of units in the inventory count."
+      - name: UNIT_Count_Value
+        description: "Count value of units in the inventory count."
+      - name: EACH_TOTAL_VALUE
+        description: "Total value of individual items in the inventory count."
+      - name: EACH_Count_Value
+        description: "Count value of individual items in the inventory count."
+      - name: inventory_total_value
+        description: "Calculated total value of the inventory, summing cases, units, and individual items."
+      - name: AvgPrice
+        description: "Average price of the inventory item."

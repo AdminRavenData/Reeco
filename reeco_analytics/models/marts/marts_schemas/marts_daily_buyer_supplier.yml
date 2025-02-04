@@ -1,0 +1,30 @@
+version: 2
+
+models:
+  - name: marts_daily_buyer_supplier
+    description: >
+      This model combines data from buyers, suppliers, and their groupings to calculate 
+      metrics for orders placed by buyers with suppliers. Metrics include the count of 
+      distinct orders and the total price of received items.
+    config:
+      materialized: table      
+    columns:
+      - name: BUYER_SUPPLIER_ID
+        description: >
+          A unique identifier representing the relationship between the buyer and supplier.
+      - name: BUYER_ID
+        description: "The unique identifier for the buyer."
+      - name: CHAIN_ID
+        description: >
+          The chain identifier associated with the buyer, derived from the `buyers_view` CTE.
+      - name: SUPPLIER_ID
+        description: "The unique identifier for the supplier."
+      - name: SUPPLIERS_GROUP_ID
+        description: >
+          The group identifier for the supplier, derived from the `sup_group_id` CTE."
+      - name: ORDER_DELIVERY_DATETIME
+        description: "The date when the order was delivered."
+      - name: orders_placed
+        description: "The count of distinct orders placed by the buyer with the supplier on a given day."
+      - name: orders_placed_TOTAL_PRICE
+        description: "The total price of items received in orders placed on a given day."

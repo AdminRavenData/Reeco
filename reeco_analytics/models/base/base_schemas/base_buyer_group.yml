@@ -1,0 +1,14 @@
+version: 2
+
+models:
+  - name: base_buyer_group
+    description: Aggregates distinct buyer counts by chain.
+    config:
+      materialized: table
+    columns:
+      - name: CHAIN_ID
+        description: The unique identifier for the chain.
+      - name: CHAIN_NAME
+        description: The name of the chain.
+      - name: count_distinct_buyers
+        description: The count of distinct buyers associated with each chain.

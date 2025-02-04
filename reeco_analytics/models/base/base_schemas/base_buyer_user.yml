@@ -1,0 +1,26 @@
+version: 2
+
+models:
+  - name: base_buyer_user
+    description: Aggregates user information grouped by chain, buyer, and outlet details.
+    config:
+      materialized: table
+    columns:
+      - name: CHAIN_ID
+        description: The unique identifier for the chain.
+      - name: BUYER_ID
+        description: The unique identifier for the buyer.
+      - name: OUTLET_ID
+        description: The unique identifier for the outlet.
+      - name: USER_ID
+        description: The unique identifier for the user.
+      - name: FIRSTNAME
+        description: The first name of the user.
+      - name: LASTNAME
+        description: The last name of the user.
+      - name: EMAIL
+        description: The email address of the user.
+      - name: PHONE
+        description: The phone number of the user.
+      - name: JOBTITLE
+        description: The job title of the user.

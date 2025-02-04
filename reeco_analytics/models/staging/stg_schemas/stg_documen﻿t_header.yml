@@ -1,0 +1,59 @@
+version: 2
+
+models:
+  - name: stg_document_header
+    description: "Staging model for document headers, including metadata and financial details."
+
+    columns:
+      - name: document_id
+        description: "Unique identifier for the document."
+        tests:
+          - not_null
+      
+      - name: buyer_id
+        description: "Identifier for the buyer associated with the document."
+      
+      - name: outlet_id
+        description: "Identifier for the outlet linked to the document."
+      
+      - name: reeco_supplier_id
+        description: "Identifier for the supplier in the Reeco system."
+      
+      - name: total_product_price
+        description: "Total price of products in the document."
+      
+      - name: total_amount
+        description: "Total amount of the document including all charges."
+      
+      - name: total_discount_price
+        description: "Total discount applied to the document."
+      
+      - name: total_tax
+        description: "Total tax amount applied to the document."
+      
+      - name: total_shipping
+        description: "Total shipping cost associated with the document."
+      
+      - name: invoice_date
+        description: "Invoice date extracted and converted from JSON data."
+      
+      - name: create_datetime
+        description: "Timestamp when the document was created."
+      
+      - name: duedate
+        description: "Due date of the document extracted and converted from JSON data."
+      
+      - name: status
+        description: "Current status of the document."
+      
+      - name: orderid
+        description: "Order ID associated with the document."
+      
+      - name: source
+        description: "Source system from which the document originated."
+      
+      - name: isexported
+        description: "Boolean flag indicating if the document was exported."
+      
+      - name: export_date
+        description: "Timestamp of the export date, extracted from JSON."

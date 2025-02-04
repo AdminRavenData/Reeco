@@ -1,0 +1,32 @@
+
+
+version: 2
+
+models:
+  - name: base_supplier_unified
+    description: Joins suppliers, supplier groups, and supplier contacts to create a unified dataset with detailed information about suppliers and their associated contacts.
+    config:
+      materialized: table
+    columns:
+      - name: supplier_id
+        description: The unique identifier for the supplier.
+      - name: OPCO
+        description: The OPCO value associated with the supplier.
+      - name: BUYER_SUPPLIER_ID
+        description: The unique identifier for the buyer-supplier relationship.
+      - name: BUYER_ID
+        description: The unique identifier for the buyer.
+      - name: user_id
+        description: The unique identifier for the contact user.
+      - name: FIRSTNAME
+        description: The first name of the contact.
+      - name: LASTNAME
+        description: The last name of the contact.
+      - name: EMAIL
+        description: The email address of the contact.
+      - name: PHONENUMBER
+        description: The phone number of the contact.
+      - name: AUTOSENDEMAIL
+        description: Indicates whether automatic emails are enabled for the contact.
+      - name: AUTOSENDSMS
+        description: Indicates whether automatic SMS messages are enabled for the contact.

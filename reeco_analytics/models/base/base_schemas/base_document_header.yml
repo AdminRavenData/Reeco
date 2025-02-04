@@ -1,0 +1,41 @@
+version: 2
+models:
+  - name: base_document_header
+    description: "This model selects specific fields from base_documents_unified."
+    config:
+      materialized: table
+    columns:
+      - name: DOCUMENT_ID
+        description: "Unique identifier for the document."
+      - name: BUYER_ID
+        description: "Identifier for the buyer associated with the document."
+      - name: OUTLET_ID
+        description: "Identifier for the outlet associated with the document."
+      - name: reeco_Supplier_Id
+        description: "Reeco supplier ID linked to the document."
+      - name: TOTAL_PRODUCT_PRICE
+        description: "Total price of the products in the document."
+      - name: TOTAL_AMOUNT
+        description: "Total amount including taxes and fees in the document."
+      - name: TOTAL_DISCOUNT_PRICE
+        description: "Total discount applied to the document."
+      - name: TOTAL_TAX
+        description: "Total tax for the document."
+      - name: TOTAL_SHIPPING
+        description: "Total shipping costs associated with the document."
+      - name: INVOICE_DATE
+        description: "Date when the invoice was issued."
+      - name: CREATE_DATETIME
+        description: "Datetime when the document was created."
+      - name: DUEDATE
+        description: "Due date for the document."
+      - name: STATUS
+        description: "Current status of the document."
+      - name: ORDERID
+        description: "Order ID associated with the document."
+      - name: SOURCE
+        description: "Source of the document."
+      - name: ISEXPORTED
+        description: "Flag indicating if the document was exported."
+      - name: export_date
+        description: "Datetime when the document was exported."

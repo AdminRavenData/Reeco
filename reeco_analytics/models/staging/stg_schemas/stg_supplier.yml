@@ -1,0 +1,12 @@
+version: 2
+
+models:
+  - name: stg_supplier
+    description: Extracts the latest non-deleted, non-demo suppliers, excluding those with demo IDs, and groups them by supplier and supplier group.
+    columns:
+      - name: supplier_id
+        description: The unique identifier for the supplier.
+      - name: suppliers_group_id
+        description: The unique identifier for the supplier group associated with the supplier.
+      - name: OPCO
+        description: The maximum OPCO value associated with the supplier.

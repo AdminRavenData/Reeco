@@ -1,0 +1,49 @@
+version: 2
+
+models:
+  - name: base_order_line
+    description: "Detailed order items model containing item-level information from orders."
+    config:
+      materialized: table
+    columns:
+      - name: order_id
+        description: "Unique identifier for the order."
+      
+      - name: catalog_item_id
+        description: "Unique identifier for the catalog item."
+
+      - name: item_name
+        description: "Name of the ordered item."
+      
+      - name: order_created_date
+        description: "Timestamp when the order was created."
+      
+      - name: created_date_item
+        description: "Timestamp when the item was created."
+      
+      - name: recieved_date_item
+        description: "Timestamp when the item was received."
+      
+      - name: glcode_item
+        description: "General ledger code for the item."
+      
+      - name: expense_name_item
+        description: "Expense classification for the item."
+      
+      - name: quantity_packing_ordered_item
+        description: "Quantity of the item ordered."
+
+      - name: quantity_packing_recieved_item
+        description: "Quantity of the item received."
+      
+      - name: price_per_packing_ordered_item
+        description: "Price per unit of the item as ordered."
+      
+      - name: price_per_packing_recieved_item
+        description: "Price per unit of the item as received."
+      
+      - name: total_price_ordered_item
+        description: "Total price for the item as ordered."
+
+      - name: total_price_recieved_item
+        description: "Total price for the item as received."

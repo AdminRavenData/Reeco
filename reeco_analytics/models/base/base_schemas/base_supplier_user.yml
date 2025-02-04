@@ -1,0 +1,28 @@
+version: 2
+
+models:
+  - name: base_supplier_user
+    config:
+      materialized: table
+    description: "A model to extract detailed contact information for suppliers, including buyers and users associated with them."
+    columns:
+      - name: SUPPLIERS_GROUP_ID
+        description: "Unique identifier for the supplier group."
+      - name: SUPPLIER_ID
+        description: "Unique identifier for the supplier."
+      - name: BUYER_ID
+        description: "Unique identifier for the buyer associated with the supplier."
+      - name: USER_ID
+        description: "Unique identifier for the user associated with the supplier."
+      - name: FIRSTNAME
+        description: "First name of the contact person."
+      - name: LASTNAME
+        description: "Last name of the contact person."
+      - name: EMAIL
+        description: "Email address of the contact person."
+      - name: PHONENUMBER
+        description: "Phone number of the contact person."
+      - name: AUTOSENDEMAIL
+        description: "Flag indicating if automatic emails are enabled."
+      - name: AUTOSENDSMS
+        description: "Flag indicating if automatic SMS notifications are enabled."
