@@ -1,4 +1,3 @@
--- CREATE OR REPLACE VIEW stg_OrderService_Orders AS
 with inventory_temp as(
     select *,
     ROW_NUMBER() OVER (PARTITION BY _id ORDER BY UPDATEDATETIME DESC) AS rn
