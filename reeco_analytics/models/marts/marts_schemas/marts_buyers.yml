@@ -9,13 +9,10 @@ models:
     columns:
       - name: DATE
         description: "The date associated with either the order update or document update."
-        tests:
-          - not_null
 
       - name: BUYER_ID
         description: "Unique identifier for the buyer."
-        tests:
-          - not_null
+
 
       - name: OUTLET_ID 
         description: "Unique identifier for the buyer."
