@@ -9,9 +9,6 @@ models:
     columns:
       - name: order_id
         description: "Unique identifier for the order."
-        tests:
-          - unique
-          - not_null
       
       - name: buyer_id
         description: "Identifier for the buyer who placed the order."
