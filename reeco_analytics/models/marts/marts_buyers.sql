@@ -17,7 +17,8 @@ with order_view as(
     and BUYER_ID is not null
 
     group by 1,2,3,4
-),
+),  
+
 
 document_view as(
     SELECT
