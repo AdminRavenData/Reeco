@@ -75,7 +75,7 @@ inventory_view as(
         BUYER_ID,
         OUTLET_ID,
         date(CREATE_DATETIME) as CREATE_DATETIME,
-        count(distinct INVENTORY_COUNT_ID) as inventor_daily_count,
+        count(distinct INVENTORY_COUNT_ID) as inventory_daily_count,
         sum(INVENTORY_ITEM_TOTAL_VALUE) as INVENTORY_ITEM_TOTAL_VALUE
 
     from
@@ -129,11 +129,15 @@ orders_documents_inventory_unified as (
 ),
 
 final as (
-  -- Your original query goes here. For example:
   select 
-      buyers_view.chain_id,
-      orders_documents_inventory_unified.*,
-      buyers_view.* exclude (chain_id, BUYER_ID, OUTLET_ID)
+      buyers_view.CHAIN_NAME,
+      buyers_view.BUYER_NAME,
+      buyers_view.OUTLET_NAME,
+      orders_documents_inventory_unified.* exclude ( BUYER_ID, OUTLET_ID),
+      buyers_view.CHAIN_ID,
+      buyers_view.BUYER_ID,
+      buyers_view.OUTLET_ID
+      
   from
       orders_documents_inventory_unified
   left join 
@@ -154,12 +158,31 @@ final as (
       orders_documents_inventory_unified.CREATE_DATETIME
 ),
 
+-------------------------------------------
+-- Adding some metrics to identify churn --
+-------------------------------------------
+
 deltas as (
   select
     f.*,
-    -- Compute the previous CREATE_DATETIME per group.
-    lag(CREATE_DATETIME) over (partition by BUYER_ID, OUTLET_ID order by CREATE_DATETIME) as prev_create,
-    
+    -- Compute the previous CREATE_DATETIME per group for orders.
+    CASE 
+      WHEN ORDERED_QUANTITY_ITEM IS NOT NULL 
+      THEN lag(CREATE_DATETIME) OVER (PARTITION BY BUYER_ID, OUTLET_ID ORDER BY CREATE_DATETIME)
+    END AS prev_create_order,    
+
+    -- Compute the previous CREATE_DATETIME per group for documents.
+    CASE 
+      WHEN DOCUMENT_QUANTITY IS NOT NULL 
+      THEN lag(CREATE_DATETIME) OVER (PARTITION BY BUYER_ID, OUTLET_ID ORDER BY CREATE_DATETIME)
+    END AS prev_create_document, 
+
+    -- Compute the previous CREATE_DATETIME per group for inventories.
+    CASE 
+      WHEN inventory_daily_count IS NOT NULL 
+      THEN lag(CREATE_DATETIME) OVER (PARTITION BY BUYER_ID, OUTLET_ID ORDER BY CREATE_DATETIME)
+    END AS prev_create_inventory, 
+
     -- When there is an order, compute the day difference between current and previous CREATE_DATETIME.
     case 
       when ORDERED_QUANTITY_ITEM is not null then 
@@ -176,31 +199,61 @@ deltas as (
           CREATE_DATETIME)
     end as document_delta,
     
+    -- When there is an inventory, compute the day difference.
+    case 
+      when inventory_daily_count is not null then 
+        DATEDIFF('day',
+          lag(CREATE_DATETIME) over (partition by BUYER_ID, OUTLET_ID order by CREATE_DATETIME),
+          CREATE_DATETIME)
+    end as inventory_delta,
+
     -- Previous order date (ignoring rows without an order)
     max(case when ORDERED_QUANTITY_ITEM is not null then CREATE_DATETIME end)
       over (partition by BUYER_ID, OUTLET_ID order by CREATE_DATETIME rows between unbounded preceding and 1 preceding) as previous_order_date,
     
     -- Previous document date (ignoring rows without a document)
     max(case when document_quantity is not null then CREATE_DATETIME end)
-      over (partition by BUYER_ID, OUTLET_ID order by CREATE_DATETIME rows between unbounded preceding and 1 preceding) as previous_document_date
+      over (partition by BUYER_ID, OUTLET_ID order by CREATE_DATETIME rows between unbounded preceding and 1 preceding) as previous_document_date,
+
+    -- Previous document date (ignoring rows without a document)
+    max(case when inventory_daily_count is not null then CREATE_DATETIME end)
+      over (partition by BUYER_ID, OUTLET_ID order by CREATE_DATETIME rows between unbounded preceding and 1 preceding) as previous_invenory_date
+
   from final f
 ),
 
 final_enriched as (
   select
-    d.*,
-    -- Rolling median of order day differences over a 14-day window.
-      MEDIAN(order_delta) over (partition by BUYER_ID, OUTLET_ID) as MEDIAN_order_interval,
-    
-    -- Rolling median of document day differences over a 14-day window.
-      MEDIAN(document_delta) over (partition by BUYER_ID, OUTLET_ID)  as MEDIAN_document_interval,
-    
-    -- Rolling median of ORDERED_QUANTITY_ITEM over a 14-day window.
-      MEDIAN(ORDERED_QUANTITY_ITEM) over (partition by BUYER_ID, OUTLET_ID) as MEDIAN_ordered_qty_last2w,
-    
-    -- Rolling median of document_quantity over a 14-day window.
-      MEDIAN(document_quantity) over (partition by BUYER_ID, OUTLET_ID) as MEDIAN_document_qty_last2w
-  from deltas d
+    t1.*,
+    -- Rolling median of order day differences over a 3-months window.
+      (
+        SELECT PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY t2.order_delta)
+        FROM deltas t2
+        WHERE t2.BUYER_ID = t1.BUYER_ID
+          AND t2.OUTLET_ID IS NOT DISTINCT FROM t1.OUTLET_ID
+          AND t2.CREATE_DATETIME BETWEEN DATEADD(day, -90, t1.CREATE_DATETIME) AND t1.CREATE_DATETIME
+      ) AS MEDIAN_order_interval_per_row,
+
+    -- -- Rolling median of document day differences over a 3-months window.
+      (
+        SELECT PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY t2.document_delta)
+        FROM deltas t2
+        WHERE t2.BUYER_ID = t1.BUYER_ID
+          AND t2.OUTLET_ID IS NOT DISTINCT FROM t1.OUTLET_ID
+          AND t2.CREATE_DATETIME BETWEEN DATEADD(day, -90, t1.CREATE_DATETIME) AND t1.CREATE_DATETIME
+      ) AS MEDIAN_document_interval_per_row,
+
+    -- -- Rolling median of inventory day differences over a 3-months window.
+      (
+        SELECT PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY t2.inventory_delta)
+        FROM deltas t2
+        WHERE t2.BUYER_ID = t1.BUYER_ID
+          AND t2.OUTLET_ID IS NOT DISTINCT FROM t1.OUTLET_ID
+          AND t2.CREATE_DATETIME BETWEEN DATEADD(day, -90, t1.CREATE_DATETIME) AND t1.CREATE_DATETIME
+      ) AS MEDIAN_inventory_interval_per_row
+      
+  from deltas t1
+  order by 2,3,4 desc
 ),
 
 final_with_days as (
@@ -209,15 +262,37 @@ final_with_days as (
     -- For each group, if no previous order date exists (only one row), use the group's minimum CREATE_DATETIME.
     max(previous_order_date) over (partition by BUYER_ID, OUTLET_ID) as group_prev_order_date,
     max(previous_document_date) over (partition by BUYER_ID, OUTLET_ID) as group_prev_document_date,
-    max(MEDIAN_order_interval) over (partition by BUYER_ID, OUTLET_ID) as group_MEDIAN_order_interval,
-    max(MEDIAN_document_interval) over (partition by BUYER_ID, OUTLET_ID) as group_median_document_interval
-  from final_enriched fe
+    max(previous_invenory_date) over (partition by BUYER_ID, OUTLET_ID) as group_prev_inventory_date,
+
+    -- returns the latest median for each BUYER_ID-OUTLET_ID
+    FIRST_VALUE(MEDIAN_order_interval_per_row IGNORE NULLS) OVER (
+      PARTITION BY BUYER_ID, OUTLET_ID
+      ORDER BY CREATE_DATETIME DESC
+    ) AS latest_median_order_interval,
+    FIRST_VALUE(MEDIAN_document_interval_per_row IGNORE NULLS) OVER (
+      PARTITION BY BUYER_ID, OUTLET_ID
+      ORDER BY CREATE_DATETIME DESC
+    ) AS latest_median_document_interval,
+    FIRST_VALUE(MEDIAN_inventory_interval_per_row IGNORE NULLS) OVER (
+      PARTITION BY BUYER_ID, OUTLET_ID
+      ORDER BY CREATE_DATETIME DESC
+    ) AS latest_median_inventory_interval
+
+  from
+    final_enriched fe
 )
 
 select 
   *,
-  DATEADD(day, group_MEDIAN_order_interval, group_prev_order_date) + 1 as predicted_next_order_date,
-  DATEDIFF('day', current_date(), DATEADD(day, group_MEDIAN_order_interval, group_prev_order_date)) + 1 as days_till_next_order,
-  DATEADD(day, group_median_document_interval, group_prev_document_date) + 1 as predicted_next_document_date,
-  DATEDIFF('day', current_date(), DATEADD(day, group_median_document_interval, group_prev_document_date)) + 1 as days_till_next_document
+  DATEADD(day, latest_median_order_interval, group_prev_order_date) + 1 as predicted_next_order_date,
+  DATEADD(day, latest_median_document_interval, group_prev_document_date) + 1 as predicted_next_document_date,
+  DATEADD(day, latest_median_inventory_interval, group_prev_inventory_date) + 1 as predicted_next_inventory_date,
+
+  DATEDIFF('day', current_date(), DATEADD(day, latest_median_order_interval, group_prev_order_date)) + 1 as days_till_next_order,
+  DATEDIFF('day', current_date(), DATEADD(day, latest_median_document_interval, group_prev_document_date)) + 1 as days_till_next_document,
+  DATEDIFF('day', current_date(), DATEADD(day, latest_median_inventory_interval, group_prev_inventory_date)) + 1 as days_till_next_inventory,
+
+  DATEDIFF('day', current_date(), DATEADD(day, latest_median_order_interval*2, group_prev_order_date)) + 1 as days_till_order_desertion,
+  DATEDIFF('day', current_date(), DATEADD(day, latest_median_document_interval*2, group_prev_document_date)) + 1 as days_till_document_desertion,
+  DATEDIFF('day', current_date(), DATEADD(day, latest_median_inventory_interval*2, group_prev_inventory_date)) + 1 as days_till_inventory_desertion
 from final_with_days
