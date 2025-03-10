@@ -10,6 +10,7 @@ from
     {{ref("base_buyer_outlet")}} 
 
 union all
+
 select
     CHAIN_ID,
     BUYER_ID,
@@ -25,7 +26,6 @@ group by
     CHAIN_NAME,
     BUYER_NAME
 ),
-
 
 
 orders_view as(
@@ -56,10 +56,8 @@ documents_view as(
         BUYER_ID,
         OUTLET_ID,
         date(CREATE_DATETIME) as CREATE_DATETIME,
-
         count(distinct DOCUMENT_ID) as document_quantity,
         sum(Total_Price_item_document) as Total_Price_document
-
 
     from
         {{ref("base_document_unified")}} 
@@ -79,7 +77,7 @@ inventory_view as(
         sum(INVENTORY_ITEM_TOTAL_VALUE) as INVENTORY_ITEM_TOTAL_VALUE
 
     from
-    {{ref("base_inventory_unified")}} 
+      {{ref("base_inventory_unified")}} 
 
     group by
         BUYER_ID,
@@ -128,6 +126,40 @@ orders_documents_inventory_unified as (
     orders_documents_unified.OUTLET_ID is null and inventory_view.OUTLET_ID is null)
 ),
 
+-- Generate a list of missing dates (yesterday and today)
+date_generator AS (
+    SELECT DATEADD(DAY, -1, CURRENT_DATE) AS CREATE_DATETIME
+),
+
+distinct_buyers_outlets AS (
+    SELECT DISTINCT 
+        CHAIN_ID,
+        CHAIN_NAME,
+        BUYER_ID,
+        BUYER_NAME,
+        OUTLET_ID,
+        OUTLET_NAME
+    FROM buyers_view
+),
+
+missing_dates AS (
+    SELECT 
+        distinct_buyers_outlets.CHAIN_ID,
+        distinct_buyers_outlets.CHAIN_NAME,
+        distinct_buyers_outlets.BUYER_ID,
+        distinct_buyers_outlets.BUYER_NAME,
+        distinct_buyers_outlets.OUTLET_ID,
+        distinct_buyers_outlets.OUTLET_NAME,
+        date_generator.CREATE_DATETIME
+    FROM distinct_buyers_outlets
+    CROSS JOIN date_generator
+    LEFT JOIN orders_documents_inventory_unified AS existing_data
+    ON distinct_buyers_outlets.BUYER_ID = existing_data.BUYER_ID
+    AND COALESCE(distinct_buyers_outlets.OUTLET_ID, 'NA') = COALESCE(existing_data.OUTLET_ID, 'NA')
+    AND date_generator.CREATE_DATETIME = existing_data.CREATE_DATETIME
+    WHERE existing_data.BUYER_ID IS NULL
+),
+
 final as (
   select 
       buyers_view.CHAIN_NAME,
@@ -151,11 +183,30 @@ final as (
       (orders_documents_inventory_unified.BUYER_ID = buyers_view.BUYER_ID 
        and orders_documents_inventory_unified.OUTLET_ID is null 
        and buyers_view.OUTLET_ID is null)
-  order by 
-      chain_id, 
-      orders_documents_inventory_unified.BUYER_ID, 
-      orders_documents_inventory_unified.OUTLET_ID, 
-      orders_documents_inventory_unified.CREATE_DATETIME
+
+
+  UNION ALL
+
+  -- Append missing dates with NULL values
+  SELECT 
+      missing_dates.CHAIN_NAME,
+      missing_dates.BUYER_NAME,
+      missing_dates.OUTLET_NAME,
+      missing_dates.CREATE_DATETIME,
+      NULL AS ORDERED_QUANTITY_ITEM,
+      NULL AS ORDERED_QUANTITY,
+      NULL AS ORDERED_TOTAL_PRICE,
+      NULL AS RECIEVED_TOTAL_PRICE,
+      NULL AS DOCUMENT_QUANTITY,
+      NULL AS TOTAL_PRICE_DOCUMENT,
+      NULL AS INVENTORY_DAILY_COUNT,
+      NULL AS INVENTORY_ITEM_TOTAL_VALUE,
+      missing_dates.CHAIN_ID,
+      missing_dates.BUYER_ID,
+      missing_dates.OUTLET_ID
+
+  FROM missing_dates
+
 ),
 
 -------------------------------------------
