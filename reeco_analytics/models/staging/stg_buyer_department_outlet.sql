@@ -36,7 +36,8 @@ Buyers_Final AS (
         TRY_PARSE_JSON(TIMEZONE):_id::STRING AS TIMEZONE,
         CREATEDATETIME AS time_created,  
         UPDATEDATETIME as time_updated,
-        ALLOWEDAUTHROLESIDS
+        ALLOWEDAUTHROLESIDS,
+        ISDISABLED
     FROM Buyers_TEMP
       where rn = 1
 ),
@@ -66,7 +67,8 @@ SELECT
     D.code_outlet,
     D.Description_outlet,
     D.Budget_Value_outlet,
-    B.ALLOWEDAUTHROLESIDS
+    B.ALLOWEDAUTHROLESIDS,
+    B.ISDISABLED
 
     
 FROM Buyers_Final B

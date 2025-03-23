@@ -32,7 +32,8 @@ select
     BUYER_ID,
     PURCHASING as role_PURCHASING, 
     ACCOUNTS_PAYABLE as role_ACCOUNTS_PAYABLE,
-    INVENTORY as role_INVENTORY
+    INVENTORY as role_INVENTORY,
+    ISDISABLED
 from
     {{ref("base_buyer")}} 
 ),
@@ -187,7 +188,8 @@ final as (
       buyers_view.OUTLET_ID,
       role_PURCHASING, 
       role_ACCOUNTS_PAYABLE, 
-      role_INVENTORY
+      role_INVENTORY,
+      ISDISABLED
       
   from
       orders_documents_inventory_unified
@@ -207,7 +209,7 @@ final as (
       buyers_roles
     on
       orders_documents_inventory_unified.BUYER_ID = buyers_roles.BUYER_ID
-
+  where ISDISABLED != TRUE
   -- UNION ALL
 
   -- -- Append missing dates with NULL values
@@ -486,25 +488,73 @@ final_with_grades as(
           100
         )
       ELSE NULL
-    END AS grade_inventory_outlet
+    END AS grade_inventory_outlet,
 
-  from final_with_days)
+    
+    -- vars to compute the outlets weights
+    CASE 
+      WHEN role_PURCHASING AND ORDERED_TOTAL_PRICE IS NOT NULL AND DATEDIFF(DAY, GROUP_PREV_ORDER_DATE, CURRENT_DATE) < 90 THEN
+      1/latest_median_order_interval else null end as pre_outlet_order_weighet,
+    CASE 
+      WHEN ROLE_ACCOUNTS_PAYABLE AND TOTAL_PRICE_DOCUMENT IS NOT NULL AND DATEDIFF(DAY, GROUP_PREV_DOCUMENT_DATE, CURRENT_DATE) < 90 THEN 
+    1/LATEST_MEDIAN_DOCUMENT_INTERVAL else null end as pre_outlet_document_weighet,
+    CASE 
+      WHEN ROLE_INVENTORY AND INVENTORY_DAILY_COUNT IS NOT NULL AND DATEDIFF(DAY, GROUP_PREV_INVENTORY_DATE, CURRENT_DATE) < 90 THEN 
+    1/LATEST_MEDIAN_INVENTORY_INTERVAL else null end as pre_outlet_inventory_weighet
+  from final_with_days
+  ),
 
+final_with_days_with_buyer_temp_weights as(
+  select 
+    distinct buyer_id,outlet_id, 1/pre_outlet_order_weighet as latest_median_order_interval, 1/pre_outlet_document_weighet as LATEST_MEDIAN_DOCUMENT_INTERVAL, 1/pre_outlet_inventory_weighet as LATEST_MEDIAN_INVENTORY_INTERVAL
+  from 
+    final_with_grades
+),
 
+final_with_days_with_buyer_weights AS (
+  select
+    buyer_id, 
+    sum(latest_median_order_interval) as pre_buyer_order_weighet,
+    sum(LATEST_MEDIAN_DOCUMENT_INTERVAL) as pre_buyer_document_weighet,
+    sum(LATEST_MEDIAN_INVENTORY_INTERVAL) as pre_buyer_inventory_weighet
+
+  from
+  final_with_days_with_buyer_temp_weights
+  group by
+    buyer_id
+),
+
+final_with_grades_and_weights as(
 select 
-  final_with_grades.*,
-(
-  COALESCE(MAX(grade_order_outlet) OVER (PARTITION BY BUYER_ID, OUTLET_ID), 0) +
-  COALESCE(MAX(grade_document_outlet) OVER (PARTITION BY BUYER_ID, OUTLET_ID), 0) +
-  COALESCE(MAX(grade_inventory_outlet) OVER (PARTITION BY BUYER_ID, OUTLET_ID), 0)
-)
-/
-NULLIF(
-  (CASE WHEN MAX(grade_order_outlet) OVER (PARTITION BY BUYER_ID, OUTLET_ID) IS NOT NULL THEN 1 ELSE 0 END) +
-  (CASE WHEN MAX(grade_document_outlet) OVER (PARTITION BY BUYER_ID, OUTLET_ID) IS NOT NULL THEN 1 ELSE 0 END) +
-  (CASE WHEN MAX(grade_inventory_outlet) OVER (PARTITION BY BUYER_ID, OUTLET_ID) IS NOT NULL THEN 1 ELSE 0 END),
-  0
-) AS grade_avg
+  final_with_grades.* ,
+  pre_buyer_order_weighet,
+  pre_buyer_document_weighet,
+  pre_buyer_inventory_weighet,
+  pre_outlet_order_weighet*1/pre_buyer_order_weighet as outlet_order_weighet,
+  pre_outlet_document_weighet*1/pre_buyer_document_weighet as outlet_document_weighet,
+  pre_outlet_inventory_weighet*1/pre_buyer_inventory_weighet as outlet_inventory_weighet,  
 
 from
   final_with_grades
+left join
+  final_with_days_with_buyer_weights
+on
+final_with_grades.buyer_id = final_with_days_with_buyer_weights.buyer_id
+)
+
+select 
+  final_with_grades_and_weights.*,
+(
+  COALESCE(grade_order_outlet, 0) * COALESCE(outlet_order_weighet, 0) +
+  COALESCE(grade_document_outlet, 0) * COALESCE(outlet_document_weighet, 0) +
+  COALESCE(grade_inventory_outlet, 0) * COALESCE(outlet_inventory_weighet, 0)
+)
+/
+NULLIF(
+  (COALESCE(outlet_order_weighet, 0) +
+  COALESCE(outlet_document_weighet, 0) +
+  COALESCE(outlet_inventory_weighet, 0)),
+  0) AS grade_avg
+
+from
+  final_with_grades_and_weights

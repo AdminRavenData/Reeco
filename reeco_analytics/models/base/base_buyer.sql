@@ -7,6 +7,7 @@ WITH flattened_roles AS (
         b.BUYER_CITY,
         b.BUYER_COUNTRY,
         b.TIMEZONE,
+        b.ISDISABLED,
         ids.VALUE::STRING AS role_id
     FROM 
         {{ref("stg_buyer_department_outlet")}} b,
@@ -22,6 +23,7 @@ WITH flattened_roles AS (
         b.BUYER_CITY,
         b.BUYER_COUNTRY,
         b.TIMEZONE,
+        b.ISDISABLED,
         NULL AS role_id
     FROM 
         {{ref("stg_buyer_department_outlet")}} b
@@ -36,7 +38,7 @@ SELECT
     MAX(fr.BUYER_CITY) AS BUYER_CITY,
     MAX(fr.BUYER_COUNTRY) AS BUYER_COUNTRY,
     MAX(fr.TIMEZONE) AS TIMEZONE,
-
+    MAX(fr.ISDISABLED) AS ISDISABLED,
     -- Boolean flags for modules, ensuring NULL values return FALSE
     COALESCE(MAX(IFF(s.Module = 'Purchasing', TRUE, FALSE)), FALSE) AS Purchasing,
     COALESCE(MAX(IFF(s.Module = 'Accounts Payable', TRUE, FALSE)), FALSE) AS Accounts_Payable,
