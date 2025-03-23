@@ -210,102 +210,49 @@ final as (
     on
       orders_documents_inventory_unified.BUYER_ID = buyers_roles.BUYER_ID
   where ISDISABLED != TRUE
-  -- UNION ALL
-
-  -- -- Append missing dates with NULL values
-  -- SELECT 
-  --     missing_dates.CHAIN_NAME,
-  --     missing_dates.BUYER_NAME,
-  --     missing_dates.OUTLET_NAME,
-  --     missing_dates.CREATE_DATETIME,
-  --     NULL AS ORDERED_QUANTITY_ITEM,
-  --     NULL AS ORDERED_QUANTITY,
-  --     NULL AS ORDERED_TOTAL_PRICE,
-  --     NULL AS RECIEVED_TOTAL_PRICE,
-  --     NULL AS DOCUMENT_QUANTITY,
-  --     NULL AS TOTAL_PRICE_DOCUMENT,
-  --     NULL AS INVENTORY_DAILY_COUNT,
-  --     NULL AS INVENTORY_ITEM_TOTAL_VALUE,
-  --     missing_dates.CHAIN_ID,
-  --     missing_dates.BUYER_ID,
-  --     missing_dates.OUTLET_ID,
-  --     role_PURCHASING, 
-  --     role_ACCOUNTS_PAYABLE, 
-  --     role_INVENTORY
-
-  -- FROM missing_dates
-
-  -- left join 
-  -- buyers_roles
-  -- on
-  -- missing_dates.BUYER_ID = buyers_roles.BUYER_ID
 ),
 
 -------------------------------------------
 -- Adding some metrics to identify churn --
 -------------------------------------------
 
-deltas as (
+previous_action as (
   select
     f.*,
-    -- Compute the previous CREATE_DATETIME per group for orders.
-    CASE 
-      WHEN ORDERED_QUANTITY_ITEM IS NOT NULL 
-      THEN lag(CREATE_DATETIME) OVER (PARTITION BY BUYER_ID, OUTLET_ID ORDER BY CREATE_DATETIME)
-    END AS prev_create_order,    
+      -- Previous order date
+      MAX(CASE WHEN ORDERED_QUANTITY_ITEM IS NOT NULL THEN CREATE_DATETIME END)
+        OVER (PARTITION BY BUYER_ID, OUTLET_ID ORDER BY CREATE_DATETIME ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING) AS previous_order_date,
 
-    -- Compute the previous CREATE_DATETIME per group for documents.
-    CASE 
-      WHEN DOCUMENT_QUANTITY IS NOT NULL 
-      THEN lag(CREATE_DATETIME) OVER (PARTITION BY BUYER_ID, OUTLET_ID ORDER BY CREATE_DATETIME)
-    END AS prev_create_document, 
+      -- Previous document date
+      MAX(CASE WHEN document_quantity IS NOT NULL THEN CREATE_DATETIME END)
+        OVER (PARTITION BY BUYER_ID, OUTLET_ID ORDER BY CREATE_DATETIME ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING) AS previous_document_date,
 
-    -- Compute the previous CREATE_DATETIME per group for inventories.
-    CASE 
-      WHEN inventory_daily_count IS NOT NULL 
-      THEN lag(CREATE_DATETIME) OVER (PARTITION BY BUYER_ID, OUTLET_ID ORDER BY CREATE_DATETIME)
-    END AS prev_create_inventory, 
-
-    -- When there is an order, compute the day difference between current and previous CREATE_DATETIME.
-    case 
-      when ORDERED_QUANTITY_ITEM is not null then 
-        DATEDIFF('day',
-          lag(CREATE_DATETIME) over (partition by BUYER_ID, OUTLET_ID order by CREATE_DATETIME),
-          CREATE_DATETIME)
-    end as order_delta,
-    
-    -- When there is a document, compute the day difference.
-    case 
-      when document_quantity is not null then 
-        DATEDIFF('day',
-          lag(CREATE_DATETIME) over (partition by BUYER_ID, OUTLET_ID order by CREATE_DATETIME),
-          CREATE_DATETIME)
-    end as document_delta,
-    
-    -- When there is an inventory, compute the day difference.
-    case 
-      when inventory_daily_count is not null then 
-        DATEDIFF('day',
-          lag(CREATE_DATETIME) over (partition by BUYER_ID, OUTLET_ID order by CREATE_DATETIME),
-          CREATE_DATETIME)
-    end as inventory_delta,
-
-    -- Previous order date (ignoring rows without an order)
-    max(case when ORDERED_QUANTITY_ITEM is not null then CREATE_DATETIME end)
-      over (partition by BUYER_ID, OUTLET_ID order by CREATE_DATETIME rows between unbounded preceding and 0 preceding) as previous_order_date,
-    
-    -- Previous document date (ignoring rows without a document)
-    max(case when document_quantity is not null then CREATE_DATETIME end)
-      over (partition by BUYER_ID, OUTLET_ID order by CREATE_DATETIME rows between unbounded preceding and 0 preceding) as previous_document_date,
-
-    -- Previous document date (ignoring rows without a document)
-    max(case when inventory_daily_count is not null then CREATE_DATETIME end)
-      over (partition by BUYER_ID, OUTLET_ID order by CREATE_DATETIME rows between unbounded preceding and 0 preceding) as previous_invenory_date
-
+      -- Previous inventory date (corrected spelling)
+      MAX(CASE WHEN inventory_daily_count IS NOT NULL THEN CREATE_DATETIME END)
+        OVER (PARTITION BY BUYER_ID, OUTLET_ID ORDER BY CREATE_DATETIME ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING) AS previous_inventory_date
+        
   from final f
 ),
 
+deltas as(
+      -- When there is an order, compute the day difference between current and previous CREATE_DATETIME.
+    SELECT
+      previous_action.*,
+      -- Order delta calculation
+      DATEDIFF('day', previous_order_date, CREATE_DATETIME) AS order_delta,
+
+      -- Document delta calculation
+      DATEDIFF('day', previous_document_date, CREATE_DATETIME)  AS document_delta,
+
+      -- Inventory delta calculation
+      DATEDIFF('day', previous_inventory_date, CREATE_DATETIME)  inventory_delta
+
+    FROM 
+      previous_action
+),
+
 buyer_outlet_periods AS (
+  -- for each outlet filltering the dates the median will be computed on according to the outlet's lifetime in reeco
   SELECT
     BUYER_ID,
     OUTLET_ID,
@@ -321,6 +268,7 @@ buyer_outlet_periods AS (
 ),
 
 final_enriched as (
+  -- Computing the medians over time for each outlet
   SELECT
       d.*,
       bop.window_days,
@@ -345,6 +293,7 @@ final_enriched as (
           AND t2.CREATE_DATETIME BETWEEN DATEADD(day, -bop.window_days, d.CREATE_DATETIME) AND d.CREATE_DATETIME
         )  else null end
       ) AS MEDIAN_document_interval_per_row,
+
       (case when inventory_delta is not null then (
           SELECT PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY t2.inventory_delta)
           FROM deltas t2
@@ -353,6 +302,7 @@ final_enriched as (
             AND t2.CREATE_DATETIME BETWEEN DATEADD(day, -bop.window_days, d.CREATE_DATETIME) AND d.CREATE_DATETIME
         )  else null end 
       ) AS MEDIAN_inventory_interval_per_row
+
     FROM deltas d
     LEFT JOIN buyer_outlet_periods bop
       ON 
@@ -368,12 +318,13 @@ final_enriched as (
 ,
 
 final_with_days as (
+  -- computing the latest median per outlet- flow (orders, documents, inventory)
   select
     fe.*,
     -- For each group, if no previous order date exists (only one row), use the group's minimum CREATE_DATETIME.
     max(previous_order_date) over (partition by BUYER_ID, OUTLET_ID) as group_prev_order_date,
     max(previous_document_date) over (partition by BUYER_ID, OUTLET_ID) as group_prev_document_date,
-    max(previous_invenory_date) over (partition by BUYER_ID, OUTLET_ID) as group_prev_inventory_date,
+    max(previous_inventory_date) over (partition by BUYER_ID, OUTLET_ID) as group_prev_inventory_date,
 
     -- returns the latest median for each BUYER_ID-OUTLET_ID
     FIRST_VALUE(MEDIAN_order_interval_per_row IGNORE NULLS) OVER (
@@ -434,7 +385,7 @@ final_with_grades as(
 
     -- Compute grade_order_outlet: only if ROLE_PURCHASING is true and TOTAL_PRICE_DOCUMENT is not null
     CASE 
-      WHEN role_PURCHASING AND ORDERED_TOTAL_PRICE IS NOT NULL AND DATEDIFF(DAY, GROUP_PREV_ORDER_DATE, CURRENT_DATE) < 90 THEN  
+      WHEN role_PURCHASING AND DATEDIFF(DAY, GROUP_PREV_ORDER_DATE, CURRENT_DATE) < 90 THEN  
         LEAST(
           GREATEST(
             80 
@@ -453,7 +404,7 @@ final_with_grades as(
     END AS grade_order_outlet,
 
     CASE 
-      WHEN ROLE_ACCOUNTS_PAYABLE AND TOTAL_PRICE_DOCUMENT IS NOT NULL AND DATEDIFF(DAY, GROUP_PREV_DOCUMENT_DATE, CURRENT_DATE) < 90 THEN 
+      WHEN ROLE_ACCOUNTS_PAYABLE AND DATEDIFF(DAY, GROUP_PREV_DOCUMENT_DATE, CURRENT_DATE) < 90 THEN 
         LEAST(
           GREATEST(
             80 
@@ -472,7 +423,7 @@ final_with_grades as(
     END AS grade_document_outlet,
 
     CASE 
-      WHEN ROLE_INVENTORY AND INVENTORY_DAILY_COUNT IS NOT NULL AND DATEDIFF(DAY, GROUP_PREV_INVENTORY_DATE, CURRENT_DATE) < 90 THEN 
+      WHEN ROLE_INVENTORY AND DATEDIFF(DAY, GROUP_PREV_INVENTORY_DATE, CURRENT_DATE) < 90 THEN 
         LEAST(
           GREATEST(
             80 
@@ -493,20 +444,25 @@ final_with_grades as(
     
     -- vars to compute the outlets weights
     CASE 
-      WHEN role_PURCHASING AND ORDERED_TOTAL_PRICE IS NOT NULL AND DATEDIFF(DAY, GROUP_PREV_ORDER_DATE, CURRENT_DATE) < 90 THEN
+      WHEN role_PURCHASING AND DATEDIFF(DAY, GROUP_PREV_ORDER_DATE, CURRENT_DATE) < 90 THEN
       1/latest_median_order_interval else null end as pre_outlet_order_weighet,
     CASE 
-      WHEN ROLE_ACCOUNTS_PAYABLE AND TOTAL_PRICE_DOCUMENT IS NOT NULL AND DATEDIFF(DAY, GROUP_PREV_DOCUMENT_DATE, CURRENT_DATE) < 90 THEN 
+      WHEN ROLE_ACCOUNTS_PAYABLE AND DATEDIFF(DAY, GROUP_PREV_DOCUMENT_DATE, CURRENT_DATE) < 90 THEN 
     1/LATEST_MEDIAN_DOCUMENT_INTERVAL else null end as pre_outlet_document_weighet,
     CASE 
-      WHEN ROLE_INVENTORY AND INVENTORY_DAILY_COUNT IS NOT NULL AND DATEDIFF(DAY, GROUP_PREV_INVENTORY_DATE, CURRENT_DATE) < 90 THEN 
+      WHEN ROLE_INVENTORY AND DATEDIFF(DAY, GROUP_PREV_INVENTORY_DATE, CURRENT_DATE) < 90 THEN 
     1/LATEST_MEDIAN_INVENTORY_INTERVAL else null end as pre_outlet_inventory_weighet
   from final_with_days
   ),
 
 final_with_days_with_buyer_temp_weights as(
   select 
-    distinct buyer_id,outlet_id, 1/pre_outlet_order_weighet as latest_median_order_interval, 1/pre_outlet_document_weighet as LATEST_MEDIAN_DOCUMENT_INTERVAL, 1/pre_outlet_inventory_weighet as LATEST_MEDIAN_INVENTORY_INTERVAL
+    distinct buyer_id, 
+    outlet_id, 
+    pre_outlet_order_weighet as latest_median_order_interval, 
+    pre_outlet_document_weighet as LATEST_MEDIAN_DOCUMENT_INTERVAL, 
+    pre_outlet_inventory_weighet as LATEST_MEDIAN_INVENTORY_INTERVAL
+    
   from 
     final_with_grades
 ),
@@ -533,6 +489,10 @@ select
   pre_outlet_order_weighet*1/pre_buyer_order_weighet as outlet_order_weighet,
   pre_outlet_document_weighet*1/pre_buyer_document_weighet as outlet_document_weighet,
   pre_outlet_inventory_weighet*1/pre_buyer_inventory_weighet as outlet_inventory_weighet,  
+  grade_order_outlet * (pre_outlet_order_weighet*1/pre_buyer_order_weighet) as outlet_order_weighted_grade,
+  grade_document_outlet * (pre_outlet_document_weighet*1/pre_buyer_document_weighet) as outlet_documents_weighted_grade,
+  grade_inventory_outlet * (pre_outlet_inventory_weighet*1/pre_buyer_inventory_weighet) as outlet_inventory_weighted_grade
+
 
 from
   final_with_grades
@@ -541,20 +501,90 @@ left join
 on
 final_with_grades.buyer_id = final_with_days_with_buyer_weights.buyer_id
 )
+,
 
-select 
-  final_with_grades_and_weights.*,
-(
-  COALESCE(grade_order_outlet, 0) * COALESCE(outlet_order_weighet, 0) +
-  COALESCE(grade_document_outlet, 0) * COALESCE(outlet_document_weighet, 0) +
-  COALESCE(grade_inventory_outlet, 0) * COALESCE(outlet_inventory_weighet, 0)
-)
-/
-NULLIF(
-  (COALESCE(outlet_order_weighet, 0) +
-  COALESCE(outlet_document_weighet, 0) +
-  COALESCE(outlet_inventory_weighet, 0)),
-  0) AS grade_avg
-
+buyers_overall_orders_grade_view AS (
+  select distinct 
+    buyer_id,
+    outlet_id,
+    outlet_order_weighted_grade
 from
   final_with_grades_and_weights
+),
+
+buyers_overall_documents_grade_view AS (
+  select distinct 
+    buyer_id,
+    outlet_id,
+    outlet_documents_weighted_grade
+from
+  final_with_grades_and_weights
+),
+
+buyers_overall_inventory_grade_view AS (
+  select distinct 
+    buyer_id,
+    outlet_id,
+    outlet_inventory_weighted_grade
+from
+  final_with_grades_and_weights
+)
+,
+
+buyer_grades as(
+select 
+  coalesce(orders.buyer_id, documents.buyer_id, inventory.buyer_id) as buyer_id,
+  sum(outlet_order_weighted_grade) as buyer_order_weighted_grade,
+  sum(outlet_documents_weighted_grade) as buyer_documents_weighted_grade,
+  sum(outlet_inventory_weighted_grade) as buyer_inventory_weighted_grade,
+    (
+    COALESCE(sum(outlet_order_weighted_grade), 0) + 
+    COALESCE(sum(outlet_documents_weighted_grade), 0) + 
+    COALESCE(sum(outlet_inventory_weighted_grade), 0)
+  ) / 
+  NULLIF(
+    (CASE WHEN sum(outlet_order_weighted_grade) IS NOT NULL THEN 1 ELSE 0 END) +
+    (CASE WHEN sum(outlet_documents_weighted_grade) IS NOT NULL THEN 1 ELSE 0 END) +
+    (CASE WHEN sum(outlet_inventory_weighted_grade) IS NOT NULL THEN 1 ELSE 0 END),
+    0
+) AS overall_weighted_buyer_grade
+
+from 
+  buyers_overall_orders_grade_view orders
+
+full outer join 
+  buyers_overall_documents_grade_view documents
+  ON 
+    (orders.BUYER_ID = documents.BUYER_ID 
+    and orders.OUTLET_ID = documents.OUTLET_ID
+    and orders.OUTLET_ID is not null 
+    and documents.OUTLET_ID is not null)
+  or 
+    (orders.BUYER_ID = documents.BUYER_ID 
+    and orders.OUTLET_ID is null 
+    and documents.OUTLET_ID is null)
+
+full outer join 
+  buyers_overall_inventory_grade_view inventory
+  ON 
+    (orders.BUYER_ID = inventory.BUYER_ID 
+    and orders.OUTLET_ID = inventory.OUTLET_ID
+    and orders.OUTLET_ID is not null 
+    and inventory.OUTLET_ID is not null)
+  or 
+    (orders.BUYER_ID = inventory.BUYER_ID 
+    and orders.OUTLET_ID is null 
+    and inventory.OUTLET_ID is null)
+
+group by 1
+)
+
+SELECT 
+  final_with_grades_and_weights.*, 
+  buyer_grades.buyer_order_weighted_grade,
+  buyer_grades.buyer_documents_weighted_grade,
+  buyer_grades.buyer_inventory_weighted_grade,
+  buyer_grades.overall_weighted_buyer_grade
+FROM final_with_grades_and_weights 
+LEFT JOIN buyer_grades 
+  ON final_with_grades_and_weights.buyer_id = buyer_grades.buyer_id
