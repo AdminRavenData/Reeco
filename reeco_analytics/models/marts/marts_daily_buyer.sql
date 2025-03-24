@@ -48,6 +48,7 @@ orders_view as(
         -- max(date(ORDER_DELIVERY_DATETIME)) as ORDER_DELIVERY_DATETIME,
         sum(QUANTITY_PACKING_ORDERED_ITEM) as ORDERED_QUANTITY_ITEM,
         -- sum(QUANTITY_PACKING_RECIEVED_ITEM) as RECIEVED_QUANTITY_ITEM,
+        COUNT(DISTINCT Checkout_ID) as Checkout_QUANTITY,       
         COUNT(DISTINCT ORDER_ID) as ORDERED_QUANTITY,
         sum(TOTAL_PRICE_ORDERED_ITEM) as ORDERED_TOTAL_PRICE,
         sum(TOTAL_PRICE_RECIEVED_ITEM) as RECIEVED_TOTAL_PRICE
@@ -136,46 +137,6 @@ orders_documents_inventory_unified as (
     orders_documents_unified.CREATE_DATETIME = inventory_view.CREATE_DATETIME and 
     orders_documents_unified.OUTLET_ID is null and inventory_view.OUTLET_ID is null)
 ),
-
--- -- Generate a list of missing dates (yesterday and today)
--- date_generator AS (
---     SELECT DATEADD(DAY, -1, CURRENT_DATE) AS CREATE_DATETIME
--- ),
-
--- distinct_buyers_outlets AS (
---     SELECT DISTINCT 
---         CHAIN_ID,
---         CHAIN_NAME,
---         BUYER_ID,
---         BUYER_NAME,
---         OUTLET_ID,
---         OUTLET_NAME,
---         CREATE_DATETIME
---     FROM buyers_view
---     CROSS JOIN date_generator
--- ),
-
--- missing_dates AS (
---     SELECT 
---         distinct_buyers_outlets.CHAIN_ID,
---         distinct_buyers_outlets.CHAIN_NAME,
---         distinct_buyers_outlets.BUYER_ID,
---         distinct_buyers_outlets.BUYER_NAME,
---         distinct_buyers_outlets.OUTLET_ID,
---         distinct_buyers_outlets.OUTLET_NAME,
---         distinct_buyers_outlets.CREATE_DATETIME
---     FROM distinct_buyers_outlets
---     LEFT JOIN orders_documents_inventory_unified AS existing_data
---     ON 
---       (distinct_buyers_outlets.BUYER_ID = existing_data.BUYER_ID and 
---       distinct_buyers_outlets.OUTLET_ID = existing_data.OUTLET_ID and
---       distinct_buyers_outlets.CREATE_DATETIME = existing_data.CREATE_DATETIME) or
---       (distinct_buyers_outlets.BUYER_ID = existing_data.BUYER_ID and 
---       distinct_buyers_outlets.CREATE_DATETIME = existing_data.CREATE_DATETIME and 
---       distinct_buyers_outlets.OUTLET_ID is null and existing_data.OUTLET_ID is null)
-
---     WHERE existing_data.BUYER_ID IS NULL
--- ),
 
 final as (
   select 
@@ -343,7 +304,7 @@ final_with_days as (
     AVG(
       CASE 
         WHEN CREATE_DATETIME BETWEEN DATEADD(day, -window_days, current_date()) AND current_date()
-        THEN MEDIAN_order_interval_per_row 
+        THEN MEDIAN_order_interval_per_row  
         ELSE NULL 
       END
     ) OVER (PARTITION BY BUYER_ID, OUTLET_ID) AS avg_recent_order_median,
@@ -351,7 +312,7 @@ final_with_days as (
     AVG(
       CASE 
         WHEN CREATE_DATETIME BETWEEN DATEADD(day, -window_days, current_date()) AND current_date()
-        THEN MEDIAN_DOCUMENT_INTERVAL_PER_ROW 
+        THEN  MEDIAN_document_interval_per_row
         ELSE NULL 
       END
     ) OVER (PARTITION BY BUYER_ID, OUTLET_ID) AS avg_recent_document_median,
@@ -388,8 +349,8 @@ final_with_grades as(
       WHEN role_PURCHASING AND DATEDIFF(DAY, GROUP_PREV_ORDER_DATE, CURRENT_DATE) < 90 THEN  
         LEAST(
           GREATEST(
-            80 
-            -  GREATEST( LEAST(100 * ((latest_median_order_interval - avg_recent_order_median) / avg_recent_order_median),20),-20)
+            100 
+            -  GREATEST( LEAST(100 * ((latest_median_order_interval - avg_recent_order_median) / avg_recent_order_median),40),-40)
             - 20 * (
                 CASE 
                   WHEN DAYS_TILL_NEXT_ORDER > -1 THEN 0 
@@ -398,17 +359,17 @@ final_with_grades as(
             ),
             0
           ),
-          100
+          130
         )
       ELSE NULL
-    END AS grade_order_outlet,
+    END AS grade_order_outlet, 
 
     CASE 
       WHEN ROLE_ACCOUNTS_PAYABLE AND DATEDIFF(DAY, GROUP_PREV_DOCUMENT_DATE, CURRENT_DATE) < 90 THEN 
         LEAST(
           GREATEST(
-            80 
-            -  GREATEST( LEAST(100 * ((LATEST_MEDIAN_DOCUMENT_INTERVAL - avg_recent_document_median) / avg_recent_document_median),20),-20)
+            100 
+            -  GREATEST( LEAST(100 * ((LATEST_MEDIAN_DOCUMENT_INTERVAL - avg_recent_document_median) / avg_recent_document_median),40),-40)
             - 20 * (
                 CASE 
                   WHEN DAYS_TILL_NEXT_DOCUMENT > -1 THEN 0 
@@ -417,7 +378,7 @@ final_with_grades as(
             ),
             0
           ),
-          100
+          130
         )
       ELSE NULL
     END AS grade_document_outlet,
@@ -426,8 +387,8 @@ final_with_grades as(
       WHEN ROLE_INVENTORY AND DATEDIFF(DAY, GROUP_PREV_INVENTORY_DATE, CURRENT_DATE) < 90 THEN 
         LEAST(
           GREATEST(
-            80 
-            -  GREATEST( LEAST(100 * ((LATEST_MEDIAN_INVENTORY_INTERVAL - avg_recent_inventory_median) / avg_recent_inventory_median),20),-20)
+            100 
+            -  GREATEST( LEAST(100 * ((LATEST_MEDIAN_INVENTORY_INTERVAL - avg_recent_inventory_median) / avg_recent_inventory_median),40),-40)
             - 20 * (
                 CASE 
                   WHEN DAYS_TILL_NEXT_INVENTORY > -1 THEN 0 
@@ -436,7 +397,7 @@ final_with_grades as(
             ),
             0
           ),
-          100
+          130
         )
       ELSE NULL
     END AS grade_inventory_outlet,
@@ -581,6 +542,19 @@ group by 1
 
 SELECT 
   final_with_grades_and_weights.*, 
+  1/MEDIAN_order_interval_per_row as num_orders_per_day, 
+  1/MEDIAN_DOCUMENT_INTERVAL_PER_ROW as num_documents_per_day, 
+  1/MEDIAN_INVENTORY_INTERVAL_PER_ROW as num_inventory_per_day,
+      ( COALESCE(grade_order_outlet, 0) + 
+    COALESCE(grade_document_outlet, 0) + 
+    COALESCE(grade_inventory_outlet, 0)
+  ) / 
+  NULLIF(
+    (CASE WHEN grade_order_outlet IS NOT NULL THEN 1 ELSE 0 END) +
+    (CASE WHEN grade_document_outlet IS NOT NULL THEN 1 ELSE 0 END) +
+    (CASE WHEN grade_inventory_outlet IS NOT NULL THEN 1 ELSE 0 END),
+    0
+) AS overall_weighted_outlet_grade,
   buyer_grades.buyer_order_weighted_grade,
   buyer_grades.buyer_documents_weighted_grade,
   buyer_grades.buyer_inventory_weighted_grade,

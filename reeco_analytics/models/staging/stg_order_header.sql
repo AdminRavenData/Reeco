@@ -29,6 +29,16 @@ stg_buyer_timezone as(
         {{ref("stg_buyer_timezone")}} 
 ),
 
+checkout_ordes_map as(
+    select
+        _ID AS order_id,
+        JSON_EXTRACT_PATH_TEXT(CHECKOUTDATA, 'CheckoutDisplayId') AS Checkout_ID
+FROM 
+    orders_temp
+
+WHERE rn = 1
+),
+
 orders AS (
     SELECT 
         o._id AS order_id,  
@@ -51,6 +61,7 @@ orders AS (
         JSON_EXTRACT_PATH_TEXT(o.BUYERINFO, 'SenderUserId') AS user_Id,
         JSON_EXTRACT_PATH_TEXT(o.backofficeorderassignee, 'UserId') AS backoffice_assignee_user_Id,
         COALESCE(ARRAY_SIZE(OBJECT_KEYS(o.APPROVERLISTS)),0) AS approvers_count,
+        Checkout_ID,
         ORDERDOCUMENTS:"_0"."DocumentId" as Document_Id
         
     FROM orders_temp o
@@ -59,6 +70,12 @@ orders AS (
         stg_buyer_timezone  tm
     on
         o.BUYERID = tm.BUYER_ID
+
+    left join 
+        checkout_ordes_map  ck
+    on
+        o._id = ck.order_id
+
 
     WHERE rn = 1
     And Supplier_Id not in (select demo_id from  {{ref("stg_demo_ids")}})
