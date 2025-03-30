@@ -44,23 +44,35 @@ orders_view as(
         BUYER_ID,
         OUTLET_ID,
         date(ORDER_CREATED_DATE) as CREATE_DATETIME,
-
-        -- max(date(ORDER_DELIVERY_DATETIME)) as ORDER_DELIVERY_DATETIME,
         sum(QUANTITY_PACKING_ORDERED_ITEM) as ORDERED_QUANTITY_ITEM,
-        -- sum(QUANTITY_PACKING_RECIEVED_ITEM) as RECIEVED_QUANTITY_ITEM,
         COUNT(DISTINCT Checkout_ID) as Checkout_QUANTITY,       
         COUNT(DISTINCT ORDER_ID) as ORDERED_QUANTITY,
         sum(TOTAL_PRICE_ORDERED_ITEM) as ORDERED_TOTAL_PRICE,
         sum(TOTAL_PRICE_RECIEVED_ITEM) as RECIEVED_TOTAL_PRICE
-
     from
         {{ref("base_order_unified")}} 
-
     group by
-
         BUYER_ID,
         OUTLET_ID,
         date(ORDER_CREATED_DATE)
+    
+	-- to include yesterday in the data frame in order to update all the metrics according to yesterday
+    UNION ALL
+    
+    select
+        BUYER_ID,
+        OUTLET_ID,
+        DATEADD(day, -1, CURRENT_DATE()) as CREATE_DATETIME,
+        null as ORDERED_QUANTITY_ITEM,
+        null as Checkout_QUANTITY,
+        null as ORDERED_QUANTITY,
+        null as ORDERED_TOTAL_PRICE,
+        null as RECIEVED_TOTAL_PRICE
+    from
+        {{ref("base_order_unified")}}
+    group by
+        BUYER_ID,
+        OUTLET_ID
 ),
 
 documents_view as(
