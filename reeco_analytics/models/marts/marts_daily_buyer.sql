@@ -60,8 +60,8 @@ orders_view as(
     UNION ALL
     
     select
-        BUYER_ID,
-        OUTLET_ID,
+        distinct bo.BUYER_ID,
+        bo.OUTLET_ID,
         DATEADD(day, -1, CURRENT_DATE()) as CREATE_DATETIME,
         null as ORDERED_QUANTITY_ITEM,
         null as Checkout_QUANTITY,
@@ -69,10 +69,14 @@ orders_view as(
         null as ORDERED_TOTAL_PRICE,
         null as RECIEVED_TOTAL_PRICE
     from
-        {{ref("base_order_unified")}}
-    group by
-        BUYER_ID,
-        OUTLET_ID
+        {{ref("base_order_unified")}} bo
+    where not exists (
+        select 1
+        from {{ref("base_order_unified")}} check_orders
+        where check_orders.BUYER_ID = bo.BUYER_ID
+        and check_orders.OUTLET_ID = bo.OUTLET_ID
+        and date(check_orders.ORDER_CREATED_DATE) = DATEADD(day, -1, CURRENT_DATE())
+    )
 ),
 
 documents_view as(
