@@ -56,7 +56,7 @@ orders_view as(
         OUTLET_ID,
         date(ORDER_CREATED_DATE)
     
-	-- to include yesterday in the data frame in order to update all the metrics according to yesterday
+    -- to include yesterday in the data frame in order to update all the metrics according to yesterday
     UNION ALL
     
     select
@@ -86,14 +86,31 @@ documents_view as(
         date(CREATE_DATETIME) as CREATE_DATETIME,
         count(distinct DOCUMENT_ID) as document_quantity,
         sum(Total_Price_item_document) as Total_Price_document
-
     from
         {{ref("base_document_unified")}} 
-
     group by
         BUYER_ID,
         OUTLET_ID,
         date(CREATE_DATETIME)
+        
+    -- to include yesterday in the data frame in order to update all the metrics according to yesterday
+    UNION ALL
+    
+    select
+        distinct bd.BUYER_ID,
+        bd.OUTLET_ID,
+        DATEADD(day, -1, CURRENT_DATE()) as CREATE_DATETIME,
+        null as document_quantity,
+        null as Total_Price_document
+    from
+        {{ref("base_document_unified")}} bd
+    where not exists (
+        select 1
+        from {{ref("base_document_unified")}} check_docs
+        where check_docs.BUYER_ID = bd.BUYER_ID
+        and check_docs.OUTLET_ID = bd.OUTLET_ID
+        and date(check_docs.CREATE_DATETIME) = DATEADD(day, -1, CURRENT_DATE())
+    )
 ),
 
 inventory_view as(
@@ -103,14 +120,31 @@ inventory_view as(
         date(CREATE_DATETIME) as CREATE_DATETIME,
         count(distinct INVENTORY_COUNT_ID) as inventory_daily_count,
         sum(INVENTORY_ITEM_TOTAL_VALUE) as INVENTORY_ITEM_TOTAL_VALUE
-
     from
       {{ref("base_inventory_unified")}} 
-
     group by
         BUYER_ID,
         OUTLET_ID,
-        date(CREATE_DATETIME) 
+        date(CREATE_DATETIME)
+        
+    -- to include yesterday in the data frame in order to update all the metrics according to yesterday
+    UNION ALL
+    
+    select
+        distinct bi.BUYER_ID,
+        bi.OUTLET_ID,
+        DATEADD(day, -1, CURRENT_DATE()) as CREATE_DATETIME,
+        null as inventory_daily_count,
+        null as INVENTORY_ITEM_TOTAL_VALUE
+    from
+        {{ref("base_inventory_unified")}} bi
+    where not exists (
+        select 1
+        from {{ref("base_inventory_unified")}} check_inv
+        where check_inv.BUYER_ID = bi.BUYER_ID
+        and check_inv.OUTLET_ID = bi.OUTLET_ID
+        and date(check_inv.CREATE_DATETIME) = DATEADD(day, -1, CURRENT_DATE())
+    )
 ),
 
 orders_documents_unified as (
