@@ -381,19 +381,18 @@ final_with_days as (
 final_with_grades as(
 
   select 
-    *,
-    DATEADD(day, latest_median_order_interval, group_prev_order_date)  as predicted_next_order_date,
-    DATEADD(day, latest_median_document_interval, group_prev_document_date)  as predicted_next_document_date,
-    DATEADD(day, latest_median_inventory_interval, group_prev_inventory_date) as predicted_next_inventory_date,
+        *,
+      DATEADD(day, latest_median_order_interval, MAX(CASE WHEN ORDERED_QUANTITY_ITEM > 0 THEN CREATE_DATETIME END) OVER (PARTITION BY BUYER_ID, OUTLET_ID)) as predicted_next_order_date,
+      DATEADD(day, latest_median_document_interval, MAX(CASE WHEN DOCUMENT_QUANTITY > 0 THEN CREATE_DATETIME END) OVER (PARTITION BY BUYER_ID, OUTLET_ID)) as predicted_next_document_date,
+      DATEADD(day, latest_median_inventory_interval, MAX(CASE WHEN INVENTORY_DAILY_COUNT > 0 THEN CREATE_DATETIME END) OVER (PARTITION BY BUYER_ID, OUTLET_ID)) as predicted_next_inventory_date,
 
-    DATEDIFF('day', current_date(), DATEADD(day, latest_median_order_interval, group_prev_order_date))  as days_till_next_order,
-    DATEDIFF('day', current_date(), DATEADD(day, latest_median_document_interval, group_prev_document_date))  as days_till_next_document,
-    DATEDIFF('day', current_date(), DATEADD(day, latest_median_inventory_interval, group_prev_inventory_date))  as days_till_next_inventory,
+      DATEDIFF('day', current_date(), DATEADD(day, latest_median_order_interval, MAX(CASE WHEN ORDERED_QUANTITY_ITEM > 0 THEN CREATE_DATETIME END) OVER (PARTITION BY BUYER_ID, OUTLET_ID))) as days_till_next_order,
+      DATEDIFF('day', current_date(), DATEADD(day, latest_median_document_interval, MAX(CASE WHEN DOCUMENT_QUANTITY > 0 THEN CREATE_DATETIME END) OVER (PARTITION BY BUYER_ID, OUTLET_ID))) as days_till_next_document,
+      DATEDIFF('day', current_date(), DATEADD(day, latest_median_inventory_interval, MAX(CASE WHEN INVENTORY_DAILY_COUNT > 0 THEN CREATE_DATETIME END) OVER (PARTITION BY BUYER_ID, OUTLET_ID))) as days_till_next_inventory,
 
-    DATEDIFF('day', current_date(), DATEADD(day, latest_median_order_interval*2, group_prev_order_date)) + 1 as days_till_order_desertion,
-    DATEDIFF('day', current_date(), DATEADD(day, latest_median_document_interval*2, group_prev_document_date)) + 1 as days_till_document_desertion,
-    DATEDIFF('day', current_date(), DATEADD(day, latest_median_inventory_interval*2, group_prev_inventory_date)) + 1 as days_till_inventory_desertion,
-
+      DATEDIFF('day', current_date(), DATEADD(day, latest_median_order_interval*2, MAX(CASE WHEN ORDERED_QUANTITY_ITEM > 0 THEN CREATE_DATETIME END) OVER (PARTITION BY BUYER_ID, OUTLET_ID))) + 1 as days_till_order_desertion,
+      DATEDIFF('day', current_date(), DATEADD(day, latest_median_document_interval*2, MAX(CASE WHEN DOCUMENT_QUANTITY > 0 THEN CREATE_DATETIME END) OVER (PARTITION BY BUYER_ID, OUTLET_ID))) + 1 as days_till_document_desertion,
+      DATEDIFF('day', current_date(), DATEADD(day, latest_median_inventory_interval*2, MAX(CASE WHEN INVENTORY_DAILY_COUNT > 0 THEN CREATE_DATETIME END) OVER (PARTITION BY BUYER_ID, OUTLET_ID))) + 1 as days_till_inventory_desertion,
     -- Compute grade_order_outlet: only if ROLE_PURCHASING is true and TOTAL_PRICE_DOCUMENT is not null
     CASE 
       WHEN role_PURCHASING AND DATEDIFF(DAY, GROUP_PREV_ORDER_DATE, CURRENT_DATE) < 90 THEN  
