@@ -1,0 +1,80 @@
+version: 2
+
+models:
+  - name: stg_events
+    description: "Staging table for Mixpanel events."
+    columns:
+      - name: device_id
+        description: "Device ID associated with the event."
+      - name: distinct_id
+        description: "Distinct ID for the user or device."
+      - name: event_name
+        description: "Name of the event."
+      - name: event_name_part_1
+        description: "First component of the event name."
+      - name: event_name_part_2
+        description: "Second component of the event name."
+      - name: event_name_part_3
+        description: "Third component of the event name."
+      - name: insert_id
+        description: "Unique identifier for the event insertion."
+      - name: user_id
+        description: "User ID associated with the event."
+      - name: event_datetime
+        description: "Datetime when the event occurred."
+      - name: buyer_id
+        description: "Buyer ID from event properties."
+      - name: chain_id
+        description: "Chain ID from event properties."
+      - name: click_location
+        description: "Click location from event properties."
+      - name: country_code
+        description: "Country code from event properties."
+      - name: mp_lib
+        description: "Mixpanel library used."
+      - name: mp_sent_by_lib_version
+        description: "Version of the library that sent the event."
+      - name: product_id
+        description: "Product ID from event properties."
+      - name: product_name
+        description: "Product name from event properties."
+      - name: search_term
+        description: "Search term from event properties."
+      - name: username
+        description: "Username from event properties."
+      - name: browser
+        description: "Browser used for the event."
+      - name: browser_version
+        description: "Version of the browser used."
+      - name: city
+        description: "City from event properties."
+      - name: current_url
+        description: "Current URL from event properties."
+      - name: properties_device_id
+        description: "Device ID from event properties."
+      - name: initial_referrer
+        description: "Initial referrer URL."
+      - name: initial_referring_domain
+        description: "Initial referring domain."
+      - name: properties_insert_id
+        description: "Insert ID from event properties."
+      - name: lib_version
+        description: "Library version used."
+      - name: mp_api_endpoint
+        description: "Mixpanel API endpoint."
+      - name: os
+        description: "Operating system used."
+      - name: region
+        description: "Region from event properties."
+      - name: properties_user_id
+        description: "User ID from event properties."
+      - name: location
+        description: "Location from event properties."
+      - name: screen_height
+        description: "Screen height in pixels."
+      - name: screen_width
+        description: "Screen width in pixels."
+      - name: mp_api_datetime
+        description: "Datetime from Mixpanel API timestamp."
+      - name: mp_processing_datetime
+        description: "Datetime when Mixpanel processed the event."
