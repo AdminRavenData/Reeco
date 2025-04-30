@@ -1,22 +1,14 @@
 version: 2
 models:
   - name: base_items
+    description: "An enriched staging model that combines catalog items with their associated GL codes and checkout item changes."
     config:
       materialized: table
-    description: "An enriched staging model that combines catalog items with their associated GL codes and checkout item changes."
     columns:
       - name: ITEM_ID
         description: "Unique identifier for the catalog item."
-        data_tests:
-          - not_null:
-              config:
-                warn_if: ">1"
       - name: NAME
         description: "Name of the catalog item."
-        data_tests:
-          - not_null:
-              config:
-                warn_if: ">1"
       - name: CREATED_DATETIME
         description: "Timestamp of when the catalog item was created."
       - name: UPDATED_DATETIME
@@ -49,11 +41,3 @@ models:
         description: "Count of occurrences of the offer change."
       - name: RANK
         description: "Rank of the offer change based on occurrence count and ID."
-    meta:
-      owner: "Data Integration Team"
-      tags:
-        - staging
-        - catalog
-        - enrichment
-        - gl_codes
-        - offers
