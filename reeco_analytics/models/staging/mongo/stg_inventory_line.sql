@@ -1,6 +1,6 @@
 with inventory_temp as(
     select *,
-    ROW_NUMBER() OVER (PARTITION BY _id ORDER BY UPDATEDATETIME DESC) AS rn
+    ROW_NUMBER() OVER (PARTITION BY _id ORDER BY UPDATEDATETIME DESC, __ts_ms  DESC) AS rn
     from 
         REECO.MONGO.inventoryservice_inventorycounts
     WHERE ISDELETED = FALSE 
