@@ -1,9 +1,11 @@
 WITH Buyers_TEMP AS (
     SELECT
         *,
+        MIN(DATEADD('millisecond',TO_NUMBER(RECORD_METADATA:"CreateTime"::STRING),'1970-01-01 00:00:00')) 
+                    over (partition by _id order by RECORD_METADATA:"CreateTime"::STRING) AS BUYER_CREATED_AT,
         ROW_NUMBER() OVER (PARTITION BY _id ORDER BY UPDATEDATETIME DESC ,__ts_ms  DESC) AS rn
     FROM 
-        REECO.MONGO.BUYERSERVICE_BUYERS
+        {{ source('reeco_mongo', 'BUYERSERVICE_BUYERS') }}
     WHERE ISDEMOACCOUNT = FALSE and ISDELETED = FALSE
     and _ID not in (select demo_id from  {{ref("stg_demo_ids")}})
 ),
@@ -13,6 +15,7 @@ users AS (
         USERS.value:_id::STRING AS user_id,
         OutletsIds.value::STRING AS outlet_id,
         _ID AS Buyer_id,
+        BUYER_CREATED_AT AS Buyer_created_at,
         CHAINID AS Chain_id, 
         USERS.value:FirstName::STRING AS FirstName,
         USERS.value:LastName::STRING AS LastName,

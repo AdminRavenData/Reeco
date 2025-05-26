@@ -1,9 +1,8 @@
 -- CREATE OR REPLACE VIEW stg_OrderService_Orders AS
 with ordered_items_temp as(
     select *,
-    ROW_NUMBER() OVER (PARTITION BY _id ORDER BY UPDATEDATETIME DESC, __ts_ms  DESC) AS rn
-    from 
-    REECO.MONGO.ORDERSERVICE_ORDERS
+    ROW_NUMBER() OVER (PARTITION BY _id ORDER BY UPDATEDATETIME DESC, __ts_ms  DESC) AS rn 
+    FROM {{ source('reeco_mongo', 'ORDERSERVICE_ORDERS') }}
     WHERE ISDEMO = FALSE and ISDELETED = FALSE
       And BUYERID not in (select demo_id from  {{ref("stg_demo_ids")}})
 

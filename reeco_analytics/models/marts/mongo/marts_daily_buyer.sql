@@ -2,6 +2,7 @@ with buyers_view as(
 select
     CHAIN_ID,
     BUYER_ID,
+    Buyer_created_at,
     OUTLET_ID,
     CHAIN_NAME,
     BUYER_NAME,
@@ -14,6 +15,7 @@ union all
 select
     CHAIN_ID,
     BUYER_ID,
+    min(Buyer_created_at) as Buyer_created_at,
     null OUTLET_ID,
     CHAIN_NAME,
     BUYER_NAME,
@@ -184,6 +186,7 @@ select
     buyers_view.CHAIN_NAME,
     buyers_view.BUYER_NAME,
     buyers_view.OUTLET_NAME,
+    buyers_view.BUYER_CREATED_AT,
     orders_documents_inventory_unified.* exclude (BUYER_ID, OUTLET_ID),
     buyers_view.CHAIN_ID,
     buyers_view.BUYER_ID,
