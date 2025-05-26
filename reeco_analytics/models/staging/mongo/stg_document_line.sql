@@ -1,7 +1,7 @@
 WITH document_temp AS (
     SELECT *,
            ROW_NUMBER() OVER (PARTITION BY _id ORDER BY UPDATEDATETIME DESC, __ts_ms  DESC) AS rn
-    FROM REECO.MONGO.DOCUMENTSERVICE_DOCUMENTS
+    FROM {{ source('reeco_mongo', 'DOCUMENTSERVICE_DOCUMENTS') }}
     WHERE ISDEMO = FALSE 
       AND ISDELETED = FALSE
     And BUYERID not in (select demo_id from  {{ref("stg_demo_ids")}})

@@ -3,7 +3,7 @@ WITH Buyers_TEMP AS (
         *,
         ROW_NUMBER() OVER (PARTITION BY _id ORDER BY updatedatetime desc , __ts_ms  DESC) AS rn
     FROM 
-        REECO.MONGO.BUYERSERVICE_BUYERS
+        {{ source('reeco_mongo', 'BUYERSERVICE_BUYERS') }}
     WHERE ISDEMOACCOUNT = FALSE and ISDELETED = FALSE
     and _ID not in (select demo_id from  {{ref("stg_demo_ids")}})
 ),

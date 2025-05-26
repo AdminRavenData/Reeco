@@ -1,0 +1,52 @@
+version: 2
+
+sources:
+  - name: reeco_mongo
+    description: "Raw MongoDB sources for Reeco analytics"
+    database: REECO
+    schema: MONGO
+    tables:
+      - name: BUYERSERVICE_BUYERS
+        description: "Raw buyers data from MongoDB"
+      - name: SUPPLIERSERVICE_SUPPLIERS
+        description: "Raw suppliers data from MongoDB"
+      - name: SUPPLIERSERVICE_SUPPLIERGROUPS
+        description: "Raw supplier groups data from MongoDB"
+      - name: ORDERSERVICE_ORDERS
+        description: "Raw orders data from MongoDB"
+      - name: DOCUMENTSERVICE_DOCUMENTS
+        description: "Raw documents data from MongoDB"
+
+  - name: reeco_sql
+    description: "Raw SQL sources for Reeco analytics"
+    database: REECO
+    schema: SQL
+    tables:
+      - name: CATALOGPROD_BUYERSUPPLIERCONTACTS
+        description: "Raw buyer-supplier contacts from SQL"
+      - name: CATALOGPROD_BUYERSUPPLIERS
+        description: "Raw buyer-supplier relationships from SQL"
+
+  - name: reeco_mixpanel
+    description: "Raw Mixpanel event data"
+    database: REECO
+    schema: MIXPANEL
+    tables:
+      - name: MP_MASTER_EVENT_RAW
+        description: "Raw Mixpanel events"
+
+  - name: reeco_dwh
+    description: "Raw DWH sources for Reeco analytics"
+    database: REECO
+    schema: DWH
+    tables:
+      - name: BUYER_ROLE_MAPPING
+        description: "Buyer role mapping table"
+
+  - name: reeco_inventory
+    description: "Raw inventory service data"
+    database: REECO
+    schema: MONGO
+    tables:
+      - name: inventoryservice_inventorycounts
+        description: "Raw inventory counts from MongoDB"

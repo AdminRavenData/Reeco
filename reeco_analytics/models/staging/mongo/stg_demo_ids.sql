@@ -3,7 +3,7 @@ with demo_buyers as (
         _ID as demo_id,
 
         FROM 
-            REECO.MONGO.BUYERSERVICE_BUYERS
+            {{ source('reeco_mongo', 'BUYERSERVICE_BUYERS') }}
         where ISDEMOACCOUNT = True
 
 ),
@@ -13,7 +13,7 @@ demo_suppliers as(
         _ID as demo_id
         
         FROM 
-            REECO.MONGO.SUPPLIERSERVICE_SUPPLIERS
+            {{ source('reeco_mongo', 'SUPPLIERSERVICE_SUPPLIERS') }}
         where ISDEMOACCOUNT = True
 
 ),
