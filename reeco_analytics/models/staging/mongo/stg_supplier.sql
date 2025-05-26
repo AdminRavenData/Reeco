@@ -3,7 +3,7 @@ with sup_temp AS (
         *,
         ROW_NUMBER() OVER (PARTITION BY _id ORDER BY UPDATEDATETIME DESC, __ts_ms  DESC) AS rn
     FROM 
-        REECO.MONGO.SUPPLIERSERVICE_SUPPLIERS
+    {{source('reeco_mongo', 'SUPPLIERSERVICE_SUPPLIERGROUPS')}}
     WHERE ISDEMOACCOUNT = FALSE and ISDELETED = FALSE
     and _ID not in (select demo_id from  {{ref("stg_demo_ids")}})
 )

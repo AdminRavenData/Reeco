@@ -16,6 +16,8 @@ sources:
         description: "Raw orders data from MongoDB"
       - name: DOCUMENTSERVICE_DOCUMENTS
         description: "Raw documents data from MongoDB"
+      - name: inventoryservice_inventorycounts
+        description: "Raw inventory counts from MongoDB"
 
   - name: reeco_sql
     description: "Raw SQL sources for Reeco analytics"
@@ -42,11 +44,3 @@ sources:
     tables:
       - name: BUYER_ROLE_MAPPING
         description: "Buyer role mapping table"
-
-  - name: reeco_inventory
-    description: "Raw inventory service data"
-    database: REECO
-    schema: MONGO
-    tables:
-      - name: inventoryservice_inventorycounts
-        description: "Raw inventory counts from MongoDB"
