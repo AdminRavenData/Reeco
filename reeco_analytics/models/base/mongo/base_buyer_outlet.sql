@@ -1,6 +1,7 @@
 select 
 CHAIN_ID,
 BUYER_ID,
+Buyer_created_at,
 DEPARTMENT_ID,
 OUTLET_ID,
 chain_name,
@@ -17,6 +18,7 @@ from
 group by 
 CHAIN_ID,
 BUYER_ID,
+Buyer_created_at,
 DEPARTMENT_ID,
 OUTLET_ID,
 chain_name,

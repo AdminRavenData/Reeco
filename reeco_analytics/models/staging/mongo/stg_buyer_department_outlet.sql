@@ -1,6 +1,8 @@
 WITH Buyers_TEMP AS (
     SELECT
         *,
+        MIN(DATEADD('millisecond', TO_NUMBER(RECORD_METADATA:"CreateTime"::STRING), '1970-01-01 00:00:00')) 
+                    OVER (PARTITION BY _id ORDER BY RECORD_METADATA:"CreateTime"::STRING) AS BUYER_CREATED_AT,
         ROW_NUMBER() OVER (PARTITION BY _id ORDER BY updatedatetime desc , __ts_ms  DESC) AS rn
     FROM 
         {{ source('reeco_mongo', 'BUYERSERVICE_BUYERS') }}
@@ -11,6 +13,7 @@ WITH Buyers_TEMP AS (
 Departments_outlets AS (
     SELECT
         _ID AS Buyer_id,
+        BUYER_CREATED_AT AS Buyer_created_at,
         DEPT.VALUE:_id::STRING AS department_id,
         DEPT.VALUE:Name::STRING AS department_name,
         OUTLET.value:_id::STRING AS outlet_id,
@@ -31,6 +34,7 @@ Buyers_Final AS (
         _ID AS Buyer_id,
         CHAINID AS Chain_id, 
         NAME AS Buyer_name,
+        BUYER_CREATED_AT AS Buyer_created_at,
         TRY_PARSE_JSON(ADDRESS):City::STRING AS buyer_City,
         TRY_PARSE_JSON(ADDRESS):Country::STRING AS buyer_Country,
         TRY_PARSE_JSON(TIMEZONE):_id::STRING AS TIMEZONE,
@@ -53,6 +57,7 @@ chain_names as (
 SELECT 
     B.Chain_id,
     B.Buyer_id,
+    B.Buyer_created_at,
     D.department_id,
     D.outlet_id,
     c.chain_name,
