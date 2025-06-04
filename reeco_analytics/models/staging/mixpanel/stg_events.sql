@@ -64,7 +64,7 @@ WITH base_data AS (
         REECO.MIXPANEL.MP_MASTER_EVENT_RAW
 )
 SELECT
-    null as test,*,
+    null as test2,*,
     -- Parse EVENT_NAME into components using SPLIT_PART
     SPLIT_PART(event_name, ' | ', 1) AS event_name_part_1,
     SPLIT_PART(event_name, ' | ', 2) AS event_name_part_2,
