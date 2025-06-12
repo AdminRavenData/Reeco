@@ -14,6 +14,7 @@ Departments_outlets AS (
     SELECT
         _ID AS Buyer_id,
         BUYER_CREATED_AT AS Buyer_created_at,
+        DELETEDATETIME AS Buyer_deleted_at,
         DEPT.VALUE:_id::STRING AS department_id,
         DEPT.VALUE:Name::STRING AS department_name,
         OUTLET.value:_id::STRING AS outlet_id,
@@ -35,6 +36,7 @@ Buyers_Final AS (
         CHAINID AS Chain_id, 
         NAME AS Buyer_name,
         BUYER_CREATED_AT AS Buyer_created_at,
+        DELETEDATETIME AS Buyer_deleted_at,
         TRY_PARSE_JSON(ADDRESS):City::STRING AS buyer_City,
         TRY_PARSE_JSON(ADDRESS):Country::STRING AS buyer_Country,
         TRY_PARSE_JSON(TIMEZONE):_id::STRING AS TIMEZONE,
@@ -58,6 +60,7 @@ SELECT
     B.Chain_id,
     B.Buyer_id,
     B.Buyer_created_at,
+    B.Buyer_deleted_at,
     D.department_id,
     D.outlet_id,
     c.chain_name,
