@@ -50,10 +50,10 @@ Buyers_Final AS (
 
 chain_names as (
     select 
-    NAME as chain_name,
-    ACCOUNT_ID as Chain_id
+    chain_name,
+    chain_id
     from 
-    reeco.analytics_prod.HOTEL_CHAINS
+    {{ref("stg_chain")}}
 )
 
 SELECT 
