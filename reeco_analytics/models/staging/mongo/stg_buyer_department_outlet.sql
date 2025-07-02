@@ -52,8 +52,8 @@ chain_names as (
     select 
     chain_name,
     chain_id,
-    IS_DISABLED_CHAIN,
-    IS_DEMO_CHAIN
+    IS_DISABLED as IS_DISABLED_CHAIN,
+    IS_DEMO as IS_DEMO_CHAIN
     from 
     {{ref("stg_chain")}}
 )
