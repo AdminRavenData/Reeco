@@ -10,7 +10,8 @@ select
     _id as chain_id,
     NAME as chain_name,
     CREATEDATETIME as CREATE_DATETIME,
-    ISDISABLED as IS_DISABLED
+    ISDISABLED as IS_DISABLED,
+    ISDEMO AS IS_DEMO
     
  from  chain_TEMP
  where rn = 1
