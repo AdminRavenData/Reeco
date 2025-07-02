@@ -51,7 +51,9 @@ Buyers_Final AS (
 chain_names as (
     select 
     chain_name,
-    chain_id
+    chain_id,
+    IS_DISABLED_CHAIN,
+    IS_DEMO_CHAIN
     from 
     {{ref("stg_chain")}}
 )
@@ -76,7 +78,9 @@ SELECT
     D.Description_outlet,
     D.Budget_Value_outlet,
     B.ALLOWEDAUTHROLESIDS,
-    B.ISDISABLED
+    B.ISDISABLED,
+    c.IS_DISABLED_CHAIN,
+    c.IS_DEMO_CHAIN
 
     
 FROM Buyers_Final B
