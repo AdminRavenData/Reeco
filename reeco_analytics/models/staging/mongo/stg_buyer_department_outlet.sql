@@ -66,6 +66,8 @@ SELECT
     D.department_id,
     D.outlet_id,
     c.chain_name,
+    c.IS_DISABLED_CHAIN,
+    c.IS_DEMO_CHAIN,
     B.Buyer_name,
     D.department_name,
     D.outlet_name,
