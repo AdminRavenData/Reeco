@@ -1,5 +1,5 @@
 WITH document_temp AS (
-    SELECT *,
+    SELECT *,null as test,
            ROW_NUMBER() OVER (PARTITION BY _id ORDER BY UPDATEDATETIME DESC, __ts_ms  DESC) AS rn
     FROM {{ source('reeco_mongo', 'DOCUMENTSERVICE_DOCUMENTS') }}
     WHERE ISDEMO = FALSE 
